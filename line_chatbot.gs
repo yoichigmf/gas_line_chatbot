@@ -27,6 +27,15 @@ function  getPropetySheet(){
    return tgSheet;
 }
 
+//  データ書き込み用シート
+function  getFirstSheet(){
+
+   let tgSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('シート1');
+
+   //console.log( tgSheet);
+   return tgSheet;
+}
+
 function getUuid() {
   return Utilities.getUuid();
 }
@@ -87,12 +96,72 @@ function testupload(){
     while( tgfiles.hasNext()){
       var tgf = tgfiles.next();
       Logger.log( tgf.getName());
-      uploadGoogleFilesToDropbox(tgf) ;
+      resultf = "/PDF/test.jpg"
+      uploadGoogleFilesToDropbox(tgf, resultf ) ;
     }
 }
-function uploadGoogleFilesToDropbox(googleDriveFileId) {
+
+
+
+function testbinupload(){
+    const folderId ='1_G2VZkqqXFo6OQ9zuAHy5icmwsrEtk3g';
+    const folder = DriveApp.getFolderById(folderId);
+    Logger.log( folder.getName());
+    
+    var tgfiles = folder.getFilesByName('1661572752303.jpg');
+    //var tgfiles = folder.getFiles();
+
+    while( tgfiles.hasNext()){
+      var tgf = tgfiles.next();
+      Logger.log( tgf.getName());
+      resultf = "/PDF/test.jpg"
+      uploadBindataToDropbox(tgf, resultf ) ;
+    }
+}
+
+//  バイナリデータをDropBoxに保存する
+
+function uploadBindataToDropbox( bindata, resultfilename ) {
   var parameters = {
-    path: '/PDF/labnol.jpg',
+    path: resultfilename ,
+    mode: 'add',
+    autorename: true,
+    mute: false,
+  };
+
+  // Add your Dropbox Access Token
+  var dropboxAccessToken =  DROPBOX_TOKEN ;
+
+  var headers = {
+    'Content-Type': 'application/octet-stream',
+    Authorization: 'Bearer ' + dropboxAccessToken,
+    'Dropbox-API-Arg': JSON.stringify(parameters),
+  };
+ // Logger.log( googleDriveFileId.getName());
+  var driveFile = googleDriveFileId;
+
+  var options = {
+    method: 'POST',
+    headers: headers,
+    payload: bindata,
+  };
+//Logger.log(options);
+  var apiUrl = 'https://content.dropboxapi.com/2/files/upload';
+  var response = JSON.parse(UrlFetchApp.fetch(apiUrl, options).getContentText());
+
+  Logger.log(response);
+
+  fname = response.path_display;
+
+  ures = createSharedLink( resultfilename );
+  Logger.log(ures);
+  Logger.log('File uploaded successfully to Dropbox');
+}
+
+//  Google drive 上のファイルをDropBoxに保存する
+function uploadGoogleFilesToDropbox(googleDriveFileId, resultfilename ) {
+  var parameters = {
+    path: resultfilename ,
     mode: 'add',
     autorename: true,
     mute: false,
@@ -122,7 +191,7 @@ function uploadGoogleFilesToDropbox(googleDriveFileId) {
 
   fname = response.path_display;
 
-  ures = createSharedLink( '/PDF/labnol.jpg',);
+  ures = createSharedLink( resultfilename );
   Logger.log(ures);
   Logger.log('File uploaded successfully to Dropbox');
 }
