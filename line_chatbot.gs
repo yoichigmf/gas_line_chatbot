@@ -1,8 +1,18 @@
 //スプレッドシートのB1セルに配置したLINEボットのアクセストークンを取得
 //const ACCESS_TOKEN = SpreadsheetApp.getActiveSheet().getRange(1, 2).getValue();
+
+//   暫定対応   #propety という名前のシートにトークンとか書き込み
+//  Bセルに値
+//  Line Messaging APIトークン   1行目
+//  DROPBOXACCESSTOKEN          2行目
+//  SPEECHAPIKEY　　　　　　　　　 3行名
+
+
 const ACCESS_TOKEN = getPropetySheet().getRange(1, 2).getValue();
 
 const DROPBOX_TOKEN = getPropetySheet().getRange(2, 2).getValue();
+
+
 //Googleドライブに作ったフォルダのURL
 const FOLDER_ID = ScriptProperties.getProperty('FOLDER_ID');
 //LINE返信用エンドポイント
