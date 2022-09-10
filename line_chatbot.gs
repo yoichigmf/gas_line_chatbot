@@ -103,6 +103,20 @@ function testupload(){
 
 
 
+
+function make_filename( kind, ext ){  //  make unique file name
+
+   uid = getUuid();
+
+   filePath = kind + "_" + uid + "." + ext;
+      
+
+    return filePath;
+
+
+}
+
+
 function testbinupload(){
     const folderId ='1_G2VZkqqXFo6OQ9zuAHy5icmwsrEtk3g';
     const folder = DriveApp.getFolderById(folderId);
@@ -111,11 +125,25 @@ function testbinupload(){
     var tgfiles = folder.getFilesByName('1661572752303.jpg');
     //var tgfiles = folder.getFiles();
 
+
+    appname = "sample";
+    kind = "image";
+    ext = "jpg";
+
     while( tgfiles.hasNext()){
       var tgf = tgfiles.next();
       Logger.log( tgf.getName());
-      resultf = "/PDF/test.jpg"
-      uploadBindataToDropbox(tgf, resultf ) ;
+
+      filename = make_filename( kind, ext );
+
+      tgfilename = "/disasterinfo/" + appname + "/" + kind +"/" + filename ;
+
+      Logger.log( tgfilename);
+      resultf = tgfilename;
+      let bdata = tgf.getBlob().getBytes();
+      ret = uploadBindataToDropbox(bdata, resultf ) ;
+
+     Logger.log( ret );
     }
 }
 
@@ -138,7 +166,7 @@ function uploadBindataToDropbox( bindata, resultfilename ) {
     'Dropbox-API-Arg': JSON.stringify(parameters),
   };
  // Logger.log( googleDriveFileId.getName());
-  var driveFile = googleDriveFileId;
+ // var driveFile = googleDriveFileId;
 
   var options = {
     method: 'POST',
@@ -156,6 +184,8 @@ function uploadBindataToDropbox( bindata, resultfilename ) {
   ures = createSharedLink( resultfilename );
   Logger.log(ures);
   Logger.log('File uploaded successfully to Dropbox');
+
+  return ures;
 }
 
 //  Google drive 上のファイルをDropBoxに保存する
@@ -194,6 +224,8 @@ function uploadGoogleFilesToDropbox(googleDriveFileId, resultfilename ) {
   ures = createSharedLink( resultfilename );
   Logger.log(ures);
   Logger.log('File uploaded successfully to Dropbox');
+
+  return ures;
 }
 
 
@@ -216,21 +248,9 @@ function getSharedLinkMetadata(){
 function createSharedLink( filepath ){
   var parameters = {
     path: filepath,
- //   settings: {
-  //      access: "viewer",
-  //      allow_download: true,
-   //     audience: "public",
-   //    requested_visibility: "public"
-   // },
+
     
   };
-/*
-
-  curl -X POST https://api.dropboxapi.com/2/sharing/create_shared_link_with_settings \
-    --header "Authorization: Bearer <ACCESS_TOKEN>" \
-    --header "Content-Type: application/json" \
-    --data "{\"path\": \"/Prime_Numbers.txt\",\"settings\": {\"requested_visibility\": \"public\"}}"
-*/
 
   // Add your Dropbox Access Token
   var dropboxAccessToken =  DROPBOX_TOKEN ;
@@ -244,6 +264,8 @@ function createSharedLink( filepath ){
     'method': 'POST',
     'headers': headers,
     'payload':JSON.stringify(parameters),
+     'setting':{
+     'requested_visibility':{".tag":"public"}},
      'muteHttpExceptions': true,
   };
   
@@ -253,11 +275,12 @@ function createSharedLink( filepath ){
 
   try{
   var response = UrlFetchApp.fetch(apiUrl, options).getContentText();
-  
-  return response;
+   rt = JSON.parse(response);
+  return rt;
   }
   catch(e){
-  Logger.log(e)
+  Logger.log(e);
+  return null;
   }
 
 }
@@ -294,11 +317,11 @@ function upload_contents( kind , ext, content_type, response ,appname ) {
            //Logger.log( googleDriveFileId.getName());
   ////var driveFile = googleDriveFileId;
 
-  var options = {
-    method: 'POST',
-    headers: headers,
-    payload: response.getRawbody()
-  };
+           var options = {
+              method: 'POST',
+              headers: headers,
+              payload: response.getRawbody()
+        };
 
       var apiUrl = 'https://content.dropboxapi.com/2/files/upload';
       var response2 = JSON.parse(UrlFetchApp.fetch(apiUrl, options).getContentText());
