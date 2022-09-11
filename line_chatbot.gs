@@ -530,7 +530,7 @@ function saveImage(blob) {
 //スクリプトが紐付いたスプレッドシートに投稿したユーザーIDとタイムスタンプを記録
 function recodeUser(userId, timestamp, id) {
   //シートが1つしかない想定でアクティブなシートを読み込み、最終行を取得
-  const mySheet = SpreadsheetApp.getActiveSheet();
+  const mySheet =  getTargetSheet();
   const lastRow = mySheet.getLastRow();
   //スプレッドシートに写真保存が実行された履歴を保存
  
@@ -545,7 +545,7 @@ function recodeUser(userId, timestamp, id) {
 
 function recodText(userId, timestamp, tgText) {
   //シートが1つしかない想定でアクティブなシートを読み込み、最終行を取得
-  const mySheet = SpreadsheetApp.getActiveSheet();
+  const mySheet = getTargetSheet();
   const lastRow = mySheet.getLastRow();
   // テキスト書き込み
   mySheet.getRange(1 + lastRow, 1).setValue(Utilities.formatDate(new Date(timestamp), 'JST', 'yyyy-MM-dd HH:mm:ss'));
@@ -561,7 +561,7 @@ function recodText(userId, timestamp, tgText) {
 
 function recodLocation(userId, timestamp, lat, lon, address) {
   //シートが1つしかない想定でアクティブなシートを読み込み、最終行を取得
-  const mySheet = SpreadsheetApp.getActiveSheet();
+  const mySheet = getTargetSheet();
   const lastRow = mySheet.getLastRow();
   // テキスト書き込み
   mySheet.getRange(1 + lastRow, 1).setValue(Utilities.formatDate(new Date(timestamp), 'JST', 'yyyy-MM-dd HH:mm:ss'));
@@ -574,6 +574,24 @@ function recodLocation(userId, timestamp, lat, lon, address) {
   mySheet.getRange(1 + lastRow, 8).setValue('LINE');
   return 0;
  
+}
+
+function  recodImg(username, timestamp, fileurl, event){
+  const mySheet = getTargetSheet();
+  const lastRow = mySheet.getLastRow();
+  // テキスト書き込み
+  mySheet.getRange(1 + lastRow, 1).setValue(Utilities.formatDate(new Date(timestamp), 'JST', 'yyyy-MM-dd HH:mm:ss'));
+  mySheet.getRange(1 + lastRow, 2).setValue(username);
+  mySheet.getRange(1 + lastRow, 3).setValue("image");
+
+  mySheet.getRange(1 + lastRow, 4).setValue(fileurl);
+  imgurl = fileurl.replace("dl=0", "dl=1");
+  imgurl = "=image(\"" + imgurl + "\")";
+  mySheet.getRange(1 + lastRow, 5).setValue(imgurl);
+  //mySheet.getRange(1 + lastRow, 7).setValue(lon);
+  mySheet.getRange(1 + lastRow, 8).setValue('LINE');
+  return 0;
+
 }
 
 
@@ -699,28 +717,10 @@ function doPost(e) {
 
 
         let appname = getAppname();
-      //  let img = getImage(event.message.id);
-        /*
-        sendMsg(REPLY_URL, {
-            'replyToken': event.replyToken,
-            'messages': [{
-              'type': 'text',
-              'text': appname ,
-            }]
-          });
-        */
+    
+     
         let img = getImage(event.message.id);
 
-        //let img = getImageBytes(event.message.id);
-              /*
-           sendMsg(REPLY_URL, {
-            'replyToken': event.replyToken,
-            'messages': [{
-              'type': 'text',
-              'text': "image ok" ,
-            }]
-          });
-        */
 
         kind = "image";
         ext = "jpg";
@@ -733,12 +733,10 @@ function doPost(e) {
         //response = upload_contents( 'image' , 'jpg', 'application/octet-stream', img,  appname );
 
         fileurl = response["url"];
-       
-       // Console.log(fileurl);
-        //AddFileLink( response, fileurl, event.message.type  , event.timestamp,　client_pg , username);
+      
 
-        //let id = saveImage(img);
-        //recodeUser(username, event.timestamp, id, event);
+        recodImg(username, event.timestamp, fileurl, event);
+
         if (true) {
           sendMsg(REPLY_URL, {
             'replyToken': event.replyToken,
@@ -751,7 +749,7 @@ function doPost(e) {
       } catch (e) {
         Console.log(e);
       }
-      //Webhookのメッセージタイプがテキストで「写真保存先」が含まれていると、保存先を通知
+ 
     } else if (event.message.type == 'text') {
       try {
           recodText(username, event.timestamp, event.message.text, event);
