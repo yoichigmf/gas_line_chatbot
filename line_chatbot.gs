@@ -12,6 +12,7 @@ const ACCESS_TOKEN = getPropetySheet().getRange(1, 2).getValue();
 
 const DROPBOX_TOKEN = getPropetySheet().getRange(2, 2).getValue();
 
+const APPNAME = getPropetySheet().getRange(4, 2).getValue();
 
 //Googleドライブに作ったフォルダのURL
 const FOLDER_ID = ScriptProperties.getProperty('FOLDER_ID');
@@ -27,7 +28,7 @@ function  getPropetySheet(){
    return tgSheet;
 }
 
-//  データ書き込み用シート
+//  シート１を取得
 function  getFirstSheet(){
 
    let tgSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName('シート1');
@@ -40,6 +41,14 @@ function getUuid() {
   return Utilities.getUuid();
 }
 
+//   書き込み対象シートを取得
+function  getTargetSheet(){
+
+　　　let fsheet = getFirstSheet();
+
+     return fsheet;
+
+}
 function testFilename(){
 
    fname = make_filename_path( "image", "jpg");
@@ -238,10 +247,6 @@ function testShared(){
 }
 
 
-// get shared link metadata
-function getSharedLinkMetadata(){
-  
-}
 
 
 //  get url of drop box file
@@ -290,7 +295,7 @@ function createSharedLink( filepath ){
 
 //  content upload to dropbox
 
-function upload_contents( kind , ext, content_type, response ,appname ) {
+function upload_contents( kind , ext, content_type, bindata ,appname ) {
         
  //          file upload
 
@@ -315,40 +320,134 @@ function upload_contents( kind , ext, content_type, response ,appname ) {
                'Dropbox-API-Arg': JSON.stringify(parameters),
               };
            //Logger.log( googleDriveFileId.getName());
-  ////var driveFile = googleDriveFileId;
+ 
 
            var options = {
               method: 'POST',
               headers: headers,
-              payload: response.getRawbody()
+              payload:bindata
+             // payload: response.getRawbody()
         };
 
       var apiUrl = 'https://content.dropboxapi.com/2/files/upload';
       var response2 = JSON.parse(UrlFetchApp.fetch(apiUrl, options).getContentText());
 
- /*
 
+    var response3 = createSharedLink( tgfilename );
 
+    return response3;
 
-                   $ch = curl_init();
-
-                  curl_setopt_array($ch, $options);
-
-                 $result = curl_exec($ch);
-
-                 $log->addWarning("result ${result}\n");
-
-
-                  curl_close($ch);
-
-
-
-                 $path = createSharedLink( $tgfilename );  //
-                 return $path;
-
-                 */
 
   }
+
+//LINEのトーク画面にユーザーが投稿した画像を取得  byte列を返す
+function getImageBytes(id) {
+  //画像取得用エンドポイント
+  const url = 'https://api-data.line.me/v2/bot/message/' + id + '/content';
+  const data = UrlFetchApp.fetch(url, {
+    'headers': {
+      'Authorization': 'Bearer ' + ACCESS_TOKEN,
+    },
+    'method': 'get'
+  });
+
+  return data.getBlob.getBytes();
+
+  //
+}
+
+//AddFileLink( response, fileurl, event.message.type  , event,timestamp,　client_pg , username);
+
+function  AddFileLink( response, filepath, kind , time_stp,　client_pg, username){
+
+      targets =   getTargetSheet();
+/*
+      global $target_sheetname;
+
+     //  書き込みシート名
+    $sheet_tg = "${target_sheetname}!A1";
+
+    $spreadsheetId = getenv('SPREADSHEET_ID');
+
+    $client = getClient();
+
+
+    $client->addScope(Google_Service_Sheets::SPREADSHEETS);
+    $client->setApplicationName('AddSheet');
+
+
+
+    $service = new Google_Service_Sheets($client);
+
+
+    $date    = date('Y/m/d H:i:s');
+
+   //var_dump($event);
+
+    $orgfilename = "";
+
+    $comment = "";   // Google Sheets 書き出し用コメント
+    $ncomment = "";  //  slack 書き出し用コメント
+
+
+              $log->addWarning("kind ${kind}\n");
+              */
+
+
+    console.log( kind);
+    if ( kind == "image") {
+
+              
+      imgurl = filepath.replace( "?dl=0", "?dl=1" );
+      orgfilename = "=image(\"${imgurl}\")";
+
+      comment =  "=image(\"${imgurl}\")";
+    }
+    else
+    {
+
+        //        $log->addWarning("not image ${kind}\n");
+  //  $orgfilename = $event->getFileName();   //  元ファイル名
+
+   //     $comment = $orgfilename;
+     //   $ncomment = $comment;
+
+
+    }
+
+    dummy = "";
+
+     //  ユーザ名の取得
+    user = username;
+
+
+    url = filepath;
+
+
+      //        $log->addWarning("comment ${comment}\n");
+
+/*
+     $value = new Google_Service_Sheets_ValueRange();
+     $value->setValues([ 'values' => [ $date, $user, $kind, $url ,$comment, $dummy, $dummy, $client_pg] ]);
+     $resp = $service->spreadsheets_values->append($spreadsheetId , $sheet_tg, $value, [ 'valueInputOption' => 'USER_ENTERED' ] );
+
+     PostSlack($date, $user, $kind, $url ,$ncomment, "","");
+
+
+    var_dump($resp);
+
+   if ( $user === "不明" ){
+        return FALSE;
+        }
+    else {
+        return TRUE;
+        }
+
+*/ 
+
+
+}
+
 
 
 function testToken(){
@@ -409,6 +508,9 @@ function getImage(id) {
     },
     'method': 'get'
   });
+
+  //return data.getBlob;
+
   //ファイル名を被らせないように、今日のDateのミリ秒をファイル名につけて保存
   const img = data.getBlob().setName(Number(new Date()) + '.jpg');
   return img;
@@ -474,12 +576,6 @@ function recodLocation(userId, timestamp, lat, lon, address) {
  
 }
 
-function testprofile(){
-
-  uprofile = getUserProfile('U5c07954fca1129144783a3d9027a9822');
-  
-  console.log( uprofile["displayName"])
-}
 
 
 //この関数の中にクエリパラメータを配列形式で設定する
@@ -518,6 +614,67 @@ function doGet(e) {
   return ContentService.createTextOutput("Hello doGet");
 }
 
+
+
+function testbinpost(){
+    const folderId ='1_G2VZkqqXFo6OQ9zuAHy5icmwsrEtk3g';
+    const folder = DriveApp.getFolderById(folderId);
+    Logger.log( folder.getName());
+    
+    var tgfiles = folder.getFilesByName('1661572752303.jpg');
+    //var tgfiles = folder.getFiles();
+
+
+    appname = "sample";
+    kind = "image";
+    ext = "jpg";
+
+    while( tgfiles.hasNext()){
+      var tgf = tgfiles.next();
+      Logger.log( tgf.getName());
+
+      filename = make_filename( kind, ext );
+
+      tgfilename = "/disasterinfo/" + appname + "/" + kind +"/" + filename ;
+
+      Logger.log( tgfilename);
+      resultf = tgfilename;
+      let bdata = tgf.getBlob().getBytes();
+      //ret = uploadBindataToDropbox(bdata, resultf ) ;
+
+     //Logger.log( ret );
+
+      addimage( bdata , resultf );
+    }
+}
+
+function getAppname(){
+  return "test01";
+}
+function addimage( bindata, resultfilename){
+//Webhookのメッセージタイプが画像の場合のみ処理を実行
+    
+      
+        let appname = getAppname();
+
+       // let img = getImageBytes(event.message.id);
+              
+        img = bindata;
+        kind = "image";
+        ext = "jpg";
+
+      //  filename = make_filename( kind, ext );
+
+      //  resultfilename = "/disasterinfo/" + appname + "/" + kind +"/" + filename ;
+
+        response = uploadBindataToDropbox( img , resultfilename ) 
+      
+
+        fileurl = response["url"];
+       
+       Logger.log( fileurl);
+}
+
 function doPost(e) {
   //アクティブなスプレッドシートを読み込み、メッセージフラブを読み取り
   const mySheet = SpreadsheetApp.getActiveSheet();
@@ -533,18 +690,61 @@ function doPost(e) {
        username = uprofile["displayName"];
     }
     
+    client_pg = "line";
+
     //Webhookのメッセージタイプが画像の場合のみ処理を実行
     if (event.message.type == 'image') {
       try {
+
+
+
+        let appname = getAppname();
+      //  let img = getImage(event.message.id);
+        /*
+        sendMsg(REPLY_URL, {
+            'replyToken': event.replyToken,
+            'messages': [{
+              'type': 'text',
+              'text': appname ,
+            }]
+          });
+        */
         let img = getImage(event.message.id);
-        let id = saveImage(img);
-        recodeUser(username, event.timestamp, id, event);
-        if (mesFlag === 'ON') {
+
+        //let img = getImageBytes(event.message.id);
+              /*
+           sendMsg(REPLY_URL, {
+            'replyToken': event.replyToken,
+            'messages': [{
+              'type': 'text',
+              'text': "image ok" ,
+            }]
+          });
+        */
+
+        kind = "image";
+        ext = "jpg";
+
+        filename = make_filename( kind, ext );
+
+        resultfilename = "/disasterinfo/" + appname + "/" + kind +"/" + filename ;
+
+        response = uploadBindataToDropbox( img , resultfilename ) 
+        //response = upload_contents( 'image' , 'jpg', 'application/octet-stream', img,  appname );
+
+        fileurl = response["url"];
+       
+       // Console.log(fileurl);
+        //AddFileLink( response, fileurl, event.message.type  , event.timestamp,　client_pg , username);
+
+        //let id = saveImage(img);
+        //recodeUser(username, event.timestamp, id, event);
+        if (true) {
           sendMsg(REPLY_URL, {
             'replyToken': event.replyToken,
             'messages': [{
               'type': 'text',
-              'text': '画像保存しました。\nhttps://drive.google.com/file/d/' + id + '\n',
+              'text': '画像保存しました。' + fileurl ,
             }]
           });
         }
