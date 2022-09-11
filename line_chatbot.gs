@@ -356,103 +356,9 @@ function getImageBytes(id) {
   //
 }
 
-//AddFileLink( response, fileurl, event.message.type  , event,timestamp,　client_pg , username);
-
-function  AddFileLink( response, filepath, kind , time_stp,　client_pg, username){
-
-      targets =   getTargetSheet();
-/*
-      global $target_sheetname;
-
-     //  書き込みシート名
-    $sheet_tg = "${target_sheetname}!A1";
-
-    $spreadsheetId = getenv('SPREADSHEET_ID');
-
-    $client = getClient();
-
-
-    $client->addScope(Google_Service_Sheets::SPREADSHEETS);
-    $client->setApplicationName('AddSheet');
 
 
 
-    $service = new Google_Service_Sheets($client);
-
-
-    $date    = date('Y/m/d H:i:s');
-
-   //var_dump($event);
-
-    $orgfilename = "";
-
-    $comment = "";   // Google Sheets 書き出し用コメント
-    $ncomment = "";  //  slack 書き出し用コメント
-
-
-              $log->addWarning("kind ${kind}\n");
-              */
-
-
-    console.log( kind);
-    if ( kind == "image") {
-
-              
-      imgurl = filepath.replace( "?dl=0", "?dl=1" );
-      orgfilename = "=image(\"${imgurl}\")";
-
-      comment =  "=image(\"${imgurl}\")";
-    }
-    else
-    {
-
-        //        $log->addWarning("not image ${kind}\n");
-  //  $orgfilename = $event->getFileName();   //  元ファイル名
-
-   //     $comment = $orgfilename;
-     //   $ncomment = $comment;
-
-
-    }
-
-    dummy = "";
-
-     //  ユーザ名の取得
-    user = username;
-
-
-    url = filepath;
-
-
-      //        $log->addWarning("comment ${comment}\n");
-
-/*
-     $value = new Google_Service_Sheets_ValueRange();
-     $value->setValues([ 'values' => [ $date, $user, $kind, $url ,$comment, $dummy, $dummy, $client_pg] ]);
-     $resp = $service->spreadsheets_values->append($spreadsheetId , $sheet_tg, $value, [ 'valueInputOption' => 'USER_ENTERED' ] );
-
-     PostSlack($date, $user, $kind, $url ,$ncomment, "","");
-
-
-    var_dump($resp);
-
-   if ( $user === "不明" ){
-        return FALSE;
-        }
-    else {
-        return TRUE;
-        }
-
-*/ 
-
-
-}
-
-
-
-function testToken(){
-   console.log( ACCESS_TOKEN);
-}
 
 //LINEに投稿された写真を自動保存するためのGoogleドライブのフォルダを作成
 function makeDirectory() {
@@ -528,7 +434,7 @@ function saveImage(blob) {
 }
 
 //スクリプトが紐付いたスプレッドシートに投稿したユーザーIDとタイムスタンプを記録
-function recodeUser(userId, timestamp, id) {
+function recordUser(userId, timestamp, id) {
   //シートが1つしかない想定でアクティブなシートを読み込み、最終行を取得
   const mySheet =  getTargetSheet();
   const lastRow = mySheet.getLastRow();
@@ -543,7 +449,7 @@ function recodeUser(userId, timestamp, id) {
   return 0;
 }
 
-function recodText(userId, timestamp, tgText) {
+function recordText(userId, timestamp, tgText) {
   //シートが1つしかない想定でアクティブなシートを読み込み、最終行を取得
   const mySheet = getTargetSheet();
   const lastRow = mySheet.getLastRow();
@@ -559,7 +465,7 @@ function recodText(userId, timestamp, tgText) {
 }
 
 
-function recodLocation(userId, timestamp, lat, lon, address) {
+function recordLocation(userId, timestamp, lat, lon, address) {
   //シートが1つしかない想定でアクティブなシートを読み込み、最終行を取得
   const mySheet = getTargetSheet();
   const lastRow = mySheet.getLastRow();
@@ -576,7 +482,7 @@ function recodLocation(userId, timestamp, lat, lon, address) {
  
 }
 
-function  recodImg(username, timestamp, fileurl, event){
+function  recordImg(username, timestamp, fileurl, event){
   const mySheet = getTargetSheet();
   const lastRow = mySheet.getLastRow();
   // テキスト書き込み
@@ -666,9 +572,7 @@ function testbinpost(){
     }
 }
 
-function getAppname(){
-  return "test01";
-}
+
 function addimage( bindata, resultfilename){
 //Webhookのメッセージタイプが画像の場合のみ処理を実行
     
@@ -716,7 +620,7 @@ function doPost(e) {
 
 
 
-        let appname = getAppname();
+       // let appname = getAppname();
     
      
         let img = getImage(event.message.id);
@@ -727,15 +631,15 @@ function doPost(e) {
 
         filename = make_filename( kind, ext );
 
-        resultfilename = "/disasterinfo/" + appname + "/" + kind +"/" + filename ;
+        resultfilename = "/disasterinfo/" + APPNAME + "/" + kind +"/" + filename ;
 
         response = uploadBindataToDropbox( img , resultfilename ) 
-        //response = upload_contents( 'image' , 'jpg', 'application/octet-stream', img,  appname );
+  
 
         fileurl = response["url"];
       
 
-        recodImg(username, event.timestamp, fileurl, event);
+        recordImg(username, event.timestamp, fileurl, event);
 
         if (true) {
           sendMsg(REPLY_URL, {
@@ -752,7 +656,7 @@ function doPost(e) {
  
     } else if (event.message.type == 'text') {
       try {
-          recodText(username, event.timestamp, event.message.text, event);
+          recordText(username, event.timestamp, event.message.text, event);
       }
       catch (e) {
         Console.log(e);
@@ -769,7 +673,7 @@ function doPost(e) {
         });  // send message
       } //  event.messsage
     } else if (event.message.type == 'location') {
-        recodLocation(username, event.timestamp, event.message.latitude,  event.message.longitude,event.message.address);
+        recordLocation(username, event.timestamp, event.message.latitude,  event.message.longitude,event.message.address);
     }
   }
 
