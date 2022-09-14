@@ -450,7 +450,7 @@ function recordUser(userId, timestamp, id) {
 }
 
 function recordText(userId, timestamp, tgText) {
-  //シートが1つしかない想定でアクティブなシートを読み込み、最終行を取得
+  //　　書き込み対象シートを読み込み、最終行を取得
   const mySheet = getTargetSheet();
   const lastRow = mySheet.getLastRow();
   // テキスト書き込み
@@ -466,7 +466,7 @@ function recordText(userId, timestamp, tgText) {
 
 
 function recordLocation(userId, timestamp, lat, lon, address) {
-  //シートが1つしかない想定でアクティブなシートを読み込み、最終行を取得
+  //書き込み対象シートを読み込み、最終行を取得
   const mySheet = getTargetSheet();
   const lastRow = mySheet.getLastRow();
   // テキスト書き込み
@@ -646,7 +646,7 @@ function doPost(e) {
             'replyToken': event.replyToken,
             'messages': [{
               'type': 'text',
-              'text': '画像保存しました。' + fileurl ,
+              'text': '画像共有　' + fileurl ,
             }]
           });
         }
@@ -657,6 +657,16 @@ function doPost(e) {
     } else if (event.message.type == 'text') {
       try {
           recordText(username, event.timestamp, event.message.text, event);
+      　　 if (true) {
+          　sendMsg(REPLY_URL, {
+            'replyToken': event.replyToken,
+            'messages': [{
+              'type': 'text',
+              'text': 'テキストメッセージ 　' +  event.message.text ,
+            }]
+          });
+        }
+
       }
       catch (e) {
         Console.log(e);
