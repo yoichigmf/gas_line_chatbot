@@ -500,6 +500,24 @@ function  recordImg(username, timestamp, fileurl, event){
 
 }
 
+function  recordMov(username, timestamp, fileurl, event){
+  const mySheet = getTargetSheet();
+  const lastRow = mySheet.getLastRow();
+  // テキスト書き込み
+  mySheet.getRange(1 + lastRow, 1).setValue(Utilities.formatDate(new Date(timestamp), 'JST', 'yyyy-MM-dd HH:mm:ss'));
+  mySheet.getRange(1 + lastRow, 2).setValue(username);
+  mySheet.getRange(1 + lastRow, 3).setValue("video");
+
+  mySheet.getRange(1 + lastRow, 4).setValue(fileurl);
+  imgurl = fileurl.replace("dl=0", "dl=1");
+  imgurl = "=image(\"" + imgurl + "\")";
+  mySheet.getRange(1 + lastRow, 5).setValue(imgurl);
+  //mySheet.getRange(1 + lastRow, 7).setValue(lon);
+  mySheet.getRange(1 + lastRow, 8).setValue('LINE');
+  return 0;
+
+}
+
 
 
 //この関数の中にクエリパラメータを配列形式で設定する
@@ -653,6 +671,46 @@ function doPost(e) {
       } catch (e) {
         Console.log(e);
       }
+
+    } else if (event.message.type == 'video' ){
+
+ try {
+
+
+
+    
+     
+        let img = getImage(event.message.id);
+
+
+        kind = "video";
+        ext = "mp4";
+
+        filename = make_filename( kind, ext );
+
+        resultfilename = "/disasterinfo/" + APPNAME + "/" + kind +"/" + filename ;
+
+        response = uploadBindataToDropbox( img , resultfilename ) 
+  
+
+        fileurl = response["url"];
+      
+
+        recordMov(username, event.timestamp, fileurl, event);
+
+        if (true) {
+          sendMsg(REPLY_URL, {
+            'replyToken': event.replyToken,
+            'messages': [{
+              'type': 'text',
+              'text': '動画共有　' + fileurl ,
+            }]
+          });
+        }
+      } catch (e) {
+        Console.log(e);
+      }
+
  
     } else if (event.message.type == 'text') {
       try {
@@ -672,19 +730,35 @@ function doPost(e) {
         Console.log(e);
       }
 
-      
-      if (event.message.text.indexOf('画像保存先') > -1) {
-        sendMsg(REPLY_URL, {
-          'replyToken': event.replyToken,
-          'messages': [{
-            'type': 'text',
-            'text': '写真保存先↓\nhttps://drive.google.com/drive/folders/' + FOLDER_ID,
-          }]
-        });  // send message
-      } //  event.messsage
+    
     } else if (event.message.type == 'location') {
-        recordLocation(username, event.timestamp, event.message.latitude,  event.message.longitude,event.message.address);
+
+        //title = event.message.title;
+        address = event.message.address;
+        latitude = event.message.latitude;
+        longitude = event.message.longitude;
+
+         try {
+             recordLocation(username, event.timestamp, event.message.latitude,  event.message.longitude,event.message.address);
+
+          
+
+          let loctext = "入力位置情報 " + address + " " +  latitude + " " + longitude;
+
+             sendMsg(REPLY_URL, {
+            'replyToken': event.replyToken,
+            'messages': [{
+              'type': 'text',
+              'text': loctext,
+                 }]
+            });
+         }
+            catch (e) {
+            Console.log(e);
+            }
     }
+
+
   }
 
   return ContentService.createTextOutput(JSON.stringify({ 'content': 'post ok' })).setMimeType(ContentService.MimeType.JSON);
