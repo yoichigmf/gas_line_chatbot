@@ -477,7 +477,7 @@ function recordLocation(userId, timestamp, lat, lon, address) {
   mySheet.getRange(1 + lastRow, 5).setValue(address);
   mySheet.getRange(1 + lastRow, 6).setValue(lat);
   mySheet.getRange(1 + lastRow, 7).setValue(lon);
-  mySheet.getRange(1 + lastRow, 8).setValue('LINE');
+  mySheet.getRange(1 + lastRow, 8).setValue('line');
   return 0;
  
 }
@@ -495,7 +495,7 @@ function  recordImg(username, timestamp, fileurl, event){
   imgurl = "=image(\"" + imgurl + "\")";
   mySheet.getRange(1 + lastRow, 5).setValue(imgurl);
   //mySheet.getRange(1 + lastRow, 7).setValue(lon);
-  mySheet.getRange(1 + lastRow, 8).setValue('LINE');
+  mySheet.getRange(1 + lastRow, 8).setValue('line');
   return 0;
 
 }
@@ -513,7 +513,7 @@ function  recordMov(username, timestamp, fileurl, event){
   imgurl = "=image(\"" + imgurl + "\")";
   mySheet.getRange(1 + lastRow, 5).setValue(imgurl);
   //mySheet.getRange(1 + lastRow, 7).setValue(lon);
-  mySheet.getRange(1 + lastRow, 8).setValue('LINE');
+  mySheet.getRange(1 + lastRow, 8).setValue('line');
   return 0;
 
 }
@@ -528,14 +528,52 @@ function debugTest(){
     parameter:{
       id:'33',
       name: 'AA'  ,
-      cmd:'GETSHEETS'
+      cmd:'GETFEATURS'
 
     }
   }
   const a = doGet(e);
 
+  console.log(a);
+
 }
 
+
+function debugTest2(){
+  const e = {
+    parameter:{
+      id:'33',
+      name: 'AA'  ,
+      cmd:'MAP'
+
+    }
+  }
+
+
+    
+  const a = doGet(e);
+
+  console.log(a);
+
+}
+
+function debugTest3(){
+  const e = {
+    parameter:{
+      id:'33',
+      name: 'AA'  ,
+      cmd:'MAPD'
+
+    }
+  }
+
+
+    
+  const a = doGet(e);
+
+  console.log(a);
+
+}
 
 function sheetnames() { 
   var out = new Array()
@@ -551,13 +589,11 @@ function doGet(e) {
   console.log(e.parameter['cmd']);
 
 
-  //パラメータがある場合変数にはパラメータの値が入る
-  //パラメータが無いもしくはあるけれど値が空の場合変数にはfalseが入る
-  let id=e.parameter['id'] ? e.parameter['id']:false
-  let name=e.parameter['name'] ? e.parameter['name']:false
+  
 
   let  CMD = e.parameter['cmd'];
 
+  //  シートリストの取得
   if ( CMD.toUpperCase() == 'GETSHEETS'){
 
       console.log("sheets !!");
@@ -569,15 +605,39 @@ function doGet(e) {
       return ContentService.createTextOutput(JSON.stringify( snames )).setMimeType(ContentService.MimeType.JSON);
 
 
+  }　
+  else if (CMD.toUpperCase() == 'GETFEATURS'){
+    //   地物の取得
+
+　　　let  tgsheet = e.parameter['sheet'] ? e.parameter['sheet']:false;
+
+     if ( tgsheet === false ){  //  シートの指定が無い場合
+　　　　　　tgsheet = "シート1";
+     }
+
+     
+     let gjson = GetFeaturesGeoJSON( tgsheet );
+
+     console.log( JSON.stringify( gjson ));
+
+     return ContentService.createTextOutput(JSON.stringify( gjson )).setMimeType(ContentService.MimeType.JSON);
+
+  }
+  else if (CMD.toUpperCase() == 'MAP'){
+
+
+
+   var htmlOutput = HtmlService.createTemplateFromFile("index").evaluate();
+
+     htmlOutput
+    .setTitle('test.js')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+
+
+   return htmlOutput;
   }
 
 
-  if (id===false){
-    console.log("パラメータidがないもしくは値が空の場合の処理")    
-  }
-  if (name===false){
-　　　console.log("パラメータnameがないもしくは値が空の場合の処理")
-  }
   return ContentService.createTextOutput("Hello doGet");
 }
 
