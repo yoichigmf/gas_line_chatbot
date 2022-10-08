@@ -527,7 +527,9 @@ function debugTest(){
   const e = {
     parameter:{
       id:'33',
-      name: 'AA'      
+      name: 'AA'  ,
+      cmd:'GETSHEETS'
+
     }
   }
   const a = doGet(e);
@@ -535,16 +537,39 @@ function debugTest(){
 }
 
 
+function sheetnames() { 
+  var out = new Array()
+  var sheets = SpreadsheetApp.getActiveSpreadsheet().getSheets();
+  for (var i=0 ; i<sheets.length ; i++) out.push( [ sheets[i].getName() ] )
+  return out  
+}
 
 function doGet(e) {
  //パラメータをログに出力してみる。
   console.log(e.parameter['id']);
   console.log(e.parameter['name']);
+  console.log(e.parameter['cmd']);
+
 
   //パラメータがある場合変数にはパラメータの値が入る
   //パラメータが無いもしくはあるけれど値が空の場合変数にはfalseが入る
   let id=e.parameter['id'] ? e.parameter['id']:false
   let name=e.parameter['name'] ? e.parameter['name']:false
+
+  let  CMD = e.parameter['cmd'];
+
+  if ( CMD.toUpperCase() == 'GETSHEETS'){
+
+      console.log("sheets !!");
+
+      let snames = sheetnames();
+
+      console.log( snames );
+
+      return ContentService.createTextOutput(JSON.stringify( snames )).setMimeType(ContentService.MimeType.JSON);
+
+
+  }
 
 
   if (id===false){
@@ -674,11 +699,7 @@ function doPost(e) {
 
     } else if (event.message.type == 'video' ){
 
- try {
-
-
-
-    
+    try {
      
         let img = getImage(event.message.id);
 
@@ -710,10 +731,20 @@ function doPost(e) {
       } catch (e) {
         Console.log(e);
       }
+    
+   
 
- 
+
+
     } else if (event.message.type == 'text') {
       try {
+
+
+          //   #help    #map  #list   
+
+          //  #comment   
+
+
           recordText(username, event.timestamp, event.message.text, event);
       　　 if (true) {
           　sendMsg(REPLY_URL, {
