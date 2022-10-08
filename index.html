@@ -1,9 +1,181 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <base target="_top">
-  </head>
-  <body>
-    sample data aaa
-  </body>
-</html>
+<head>
+<meta charset='utf-8' />
+<title>地理院地図VectorのベクトルタイルをMaplibre JSで表示するサンプル</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.js"></script>
+<link href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css" rel="stylesheet" />
+<style>
+body { margin:0; padding:0; }
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
+
+#basemaps-selecter {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0);
+        z-index:255;
+      }
+
+
+      #basemaps {
+        font-size: 16px;
+        padding: 4px 8px;
+      }
+
+#tablearea {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 200px;
+  z-index:255;
+  box-shadow: 0 0 50px -25px black;
+  background: white;
+  display:none;
+  Overflow-y:scroll;
+  Overflow-x:scroll;
+
+
+}
+
+#displayTablechk{
+        position: absolute;
+        top: 40px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0);
+        z-index:255;
+        font-size: 16px;
+        padding: 4px 8px;
+      }
+
+
+#file {
+position: absolute;
+top: 80px;
+left: 20px;
+z-index:255;
+}
+
+#figsave {
+position: absolute;
+top: 120px;
+left: 20px;
+z-index:255;
+}
+#figclear {
+position: absolute;
+top: 140px;
+left: 20px;
+z-index:255;
+}
+#figbrowse {
+position: absolute;
+top: 160px;
+left: 20px;
+z-index:255;
+}
+
+
+</style>
+</head>
+<body>
+ 
+<div id='map'>
+  <div id="basemaps-selecter">
+
+            <select id="basemaps">
+         
+              <option value="pale">地理院タイル skelton</option>
+          
+              <option value="gsi_photo">地理院タイル写真</option>
+              </select>
+          
+          </div>
+
+
+</div>
+
+
+<script>
+var map = new maplibregl.Map({
+  container: 'map',
+  hash: true,
+  style: 'https://raw.githubusercontent.com/gsi-cyberjapan/optimal_bvmap/main/style/skeleton.json', //style.jsonへのパス
+  center: [139.767144, 35.680621],  
+  zoom: 15,
+  maxZoom: 17.99,
+  minZoom: 4,
+  localIdeographFontFamily: false
+//  localIdeographFontFamily: ['MS Gothic', 'Hiragino Kaku Gothic Pro', 'sans-serif']
+});
+
+
+map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+map.addControl(new maplibregl.ScaleControl() );
+
+
+map.on('load', function () {
+map.addSource('gsi_raster', {
+  
+                    'type': 'raster',
+                     tiles: [
+                                 'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+                             ],
+                    'tileSize': 256,
+                    'attribution':
+                    '国土地理院',
+  
+                         });
+
+map.addLayer({
+                     'id':'gsi_photo',
+                        'type':'raster',
+                        'source':'gsi_raster',
+                        'minzoom':5,
+                        'maxzoom':18,
+                        'layout':{
+                                'visibility':'none'
+                                },
+                         paint:{   "raster-opacity": 1.0}
+
+                        });
+
+});
+
+
+ 
+const basemapsSelectElement = document.querySelector("#basemaps");
+
+        basemapsSelectElement.addEventListener("change", (e) => {
+            setBasemap(e.target.value);
+ 
+           // map.triggerRepaint();
+
+        });
+
+
+   
+
+ const setBasemap = (name) => {
+
+         if (name == 'gsi_photo'){
+            console.log('gsi');
+            map.setLayoutProperty(name, 'visibility', 'visible');
+         }
+         else {
+          map.setLayoutProperty('gsi_photo', 'visibility', 'none');
+         }
+
+        };
+
+
+
+</script>
+ 
+</body>
