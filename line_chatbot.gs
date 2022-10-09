@@ -582,6 +582,39 @@ function sheetnames() {
   return out  
 }
 
+
+
+function testgjson(){
+
+  let gj = getGeoJson();
+  console.log(gj);
+  let js =JSON.stringify( gj );
+
+  console.log(js);
+
+}
+
+function  getGeoJson(){
+
+let gjson =
+{
+"type": "FeatureCollection",
+"name": "sampledata",
+"crs": { "type": "name", "properties": { "name": "urn:ogc:def:crs:OGC:1.3:CRS84" } },
+"features": [
+{ "type": "Feature", "properties": { "fid": 1, "name": "sample1", "dt": "2022-10-09T00:00:00" }, "geometry": { "type": "Point", "coordinates": [ 139.768754134689544, 35.67818273215471 ] } },
+{ "type": "Feature", "properties": { "fid": 2, "name": "sample2", "dt": "2022-10-04T00:00:00" }, "geometry": { "type": "Point", "coordinates": [ 139.772060947524153, 35.680218430776414 ] } },
+{ "type": "Feature", "properties": { "fid": 3, "name": "sample3", "dt": "2022-10-09T20:37:04" }, "geometry": { "type": "Point", "coordinates": [ 139.763513148310153, 35.679593367015016 ] } }
+]
+};
+
+return gjson;
+
+
+
+}
+
+
 function doGet(e) {
  //パラメータをログに出力してみる。
   console.log(e.parameter['id']);
@@ -618,7 +651,30 @@ function doGet(e) {
      
      let gjson = GetFeaturesGeoJSON( tgsheet );
 
+　　　space = 2;
+     console.log( JSON.stringify( gjson, null,space ));
+
+     return ContentService.createTextOutput(JSON.stringify( gjson, null, space  )).setMimeType(ContentService.MimeType.JSON);
+
+  }
+    else if (CMD.toUpperCase() == 'GFTEST'){
+    //   地物の取得
+
+　　/*
+　let  tgsheet = e.parameter['sheet'] ? e.parameter['sheet']:false;
+
+     if ( tgsheet === false ){  //  シートの指定が無い場合
+　　　　　　tgsheet = "シート1";
+     }
+
+     
+     let gjson = GetFeaturesGeoJSON( tgsheet );
+
      console.log( JSON.stringify( gjson ));
+     */
+
+    let gjson = getGeoJson();
+
 
      return ContentService.createTextOutput(JSON.stringify( gjson )).setMimeType(ContentService.MimeType.JSON);
 
@@ -630,7 +686,7 @@ function doGet(e) {
    var htmlOutput = HtmlService.createTemplateFromFile("index").evaluate();
 
      htmlOutput
-    .setTitle('test.js')
+    .setTitle("地図表示テスト")
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
 
 

@@ -8,7 +8,7 @@ function testGetGJSON(){
 //   指定シートの地物のGeoJSONを作成する
 function GetFeaturesGeoJSON( sheetname ){
   
-   let geoJ = { 'type':'FeatureCollection', 'features': new Array()};
+   let geoJ = { 'type':'FeatureCollection', "name":sheetname,"crs":{"type":"name","properties":{"name":"urn:ogc:def:crs:OGC:1.3:CRS84"}},"features": []};
 
    let tgSheet =  SpreadsheetApp.getActiveSpreadsheet().getSheetByName( sheetname );
 
@@ -88,36 +88,45 @@ function GetFeaturesGeoJSON( sheetname ){
                 
                 let atrar = new Array();
 
-                feature = new Array();
+              
+                //feature["id"] = arkey;
+                //feature["type"] = 'Feature';
 
-                feature["id"] = arkey;
-                feature["type"] = 'Feature';
+                let  coord= [ lon, lat ];
 
-                let geom = new Array();
+                var  geom = { type:"Point",
+                               coordinates: coord  };
 
-                geom["type"] = "Point";
-
-                let  coordinate = [ lon, lat ];
-
-                geom["coordinates"] = coordinate;
-                //coordinate.add( lon );
-
-                feature["geometry"]=geom;
-
-                //let prop = new Array();
                 var prop = {
                   user:userd,
                    date:dated,
                    kind: kind,
                    text:stext,
                    url: url,
-                   proplisr: atrar
-        };
+                   proplist: atrar
+                  };
 
-                feature["properties"] =prop;
+                //geom["type"] = "Point";
+//   id: arkey,
+                 var feature = { 
+                                type:'Feature',
+                                geometry:geom ,
+                                properties: prop };
 
 
-                geoJ["features"].push(feature);
+                //geom["coordinates"] = coordinate;
+                //coordinate.add( lon );
+
+                //feature["geometry"]=geom;
+
+                //let prop = new Array();
+           
+
+                //feature["properties"] =prop;
+                console.log( feature );
+
+               // geoJ["features"].push(feature);
+                output_ar.push(feature);
                 
                 //console.log( "push" );
 
@@ -129,7 +138,11 @@ function GetFeaturesGeoJSON( sheetname ){
      }
    }
 
+   geoJ["features"]=output_ar;
    console.log( geoJ );
+
+   console.log( output_ar );
+
    return geoJ;
 }
 
