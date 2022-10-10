@@ -278,15 +278,17 @@ if ( prp["proplist"].length > 0 ){
 
 
    for ( var rec of  prp["proplist"] ) {
-     rhtml = rhtml + "<TR><TD>種別</TD><TD>";
+      rhtml = rhtml + "<TR><TD>種別</TD><TD>";
 
-　　　rhtml = rhtml + rec["kind"];
-　　　rhtml = rhtml + "</TD></TR>";
+      
+      rhtml = rhtml + rec["kind"];
+      rhtml = rhtml + "</TD></TR>";
 
-     rhtml = rhtml + "<TR><TD>ユーザ</TD><TD>";
 
-　　　rhtml = rhtml + rec["user"];
-　　　rhtml = rhtml + "</TD></TR>";
+       rhtml = rhtml + "<TR><TD>ユーザ</TD><TD>";
+
+      rhtml = rhtml + rec["user"];
+      rhtml = rhtml + "</TD></TR>";
    }
 
 
@@ -303,7 +305,7 @@ if ( prp["proplist"].length > 0 ){
 function CreatePropertiesHTML( features  ){
   if ( features.length > 0 ) {
 
-　　　var  rethtml = " ";
+     var  rethtml = " ";
 
      for ( var  feature of features ){
          var thtml = CreatePropertyHTML( feature.properties );
