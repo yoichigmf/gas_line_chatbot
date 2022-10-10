@@ -1,7 +1,11 @@
 
 function testGetGJSON(){
 
-  GetFeaturesGeoJSON( "シート1");
+  var tg = GetFeaturesGeoJSON("シート1");
+
+  let js = JSON.stringify( tg );
+
+  console.log( js );
 }
 
 
@@ -19,15 +23,15 @@ function GetFeaturesGeoJSON( sheetname ){
 
    let uid_ar = new Array();   //  array of user id
 
-   let non_loc_ar = new Array();  // array of non location data
+  // let non_loc_ar = new Array();  // array of non location data
 
    let ckey = 0;
 
-   let non_locr = new Array();    //  arrray of non location data for a user
+   //let non_locr = new Array();    //  arrray of non location data for a user
 
+   var arkey;
 
-
-   console.log( rows );
+  // console.log( rows );
 
    if ( rows > 1){
 
@@ -86,7 +90,7 @@ function GetFeaturesGeoJSON( sheetname ){
 
                 let arkey = userd + "_" + ckey ;
                 
-                let atrar = new Array();
+                let atrar = [];
 
               
                 //feature["id"] = arkey;
@@ -103,11 +107,10 @@ function GetFeaturesGeoJSON( sheetname ){
                    kind: kind,
                    text:stext,
                    url: url,
-                   proplist: atrar
+                   proplist: []
                   };
 
-                //geom["type"] = "Point";
-//   id: arkey,
+
                  var feature = { 
                    　　　　　　　　id: arkey,
                                 type:'Feature',
@@ -115,24 +118,55 @@ function GetFeaturesGeoJSON( sheetname ){
                                 properties: prop };
 
 
-                //geom["coordinates"] = coordinate;
-                //coordinate.add( lon );
-
-                //feature["geometry"]=geom;
-
-                //let prop = new Array();
-           
-
-                //feature["properties"] =prop;
                 console.log( feature );
 
-               // geoJ["features"].push(feature);
-                output_ar.push(feature);
-                
-                //console.log( "push" );
 
+                output_ar.push(feature);
 
             }
+         else {  //  location 以外の場合
+             if ( ir > 0){
+
+                    var ukey = "";
+
+　　　　　　　　　　　　if ( array_key_exists( userd, uid_ar )) {
+
+                  　　　　let ukeyd  = uid_ar[userd];
+                         ukey = userd  + "_" + ukeyd;
+                  
+                        }
+                         else {
+                          ukey = arkey;
+
+                         }   //  array_key_exists
+
+                 
+
+                  var natr = {
+                  user:userd,
+                   date:dated,
+                   kind: kind,
+                   text:stext,
+                   url: url
+               
+                     };
+
+                    //  console.log( "key "+ ukey);
+
+                  if ( output_ar.length > 0 ) {
+
+                    for ( var ip =0; ip < output_ar.length; ip++){
+                     // console.log( "Okey "+ output_ar[ip].id );
+                      if ( output_ar[ip].id == ukey ){
+                          output_ar[ip].properties.proplist.push(natr);
+                      }
+                    }
+                  }
+
+                }  // ir > 0
+
+
+             }   //  not location
 
 
         
