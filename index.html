@@ -225,7 +225,7 @@ map.addLayer({
    
 
        
-       var description = CreatePropertyHTML( e.features[0].properties);
+       var description = CreatePropertiesHTML( e.features);
 
 
        console.log('A click event occurred.');
@@ -274,12 +274,52 @@ rhtml = rhtml + prp["text"];
 rhtml = rhtml + "</TD></TR>";
 
 
-  rhtml = rhtml + "<//table>";
+if ( prp["proplist"].length > 0 ){
+
+
+   for ( var rec of  prp["proplist"] ) {
+     rhtml = rhtml + "<TR><TD>種別</TD><TD>";
+
+　　　rhtml = rhtml + rec["kind"];
+　　　rhtml = rhtml + "</TD></TR>";
+
+     rhtml = rhtml + "<TR><TD>ユーザ</TD><TD>";
+
+　　　rhtml = rhtml + rec["user"];
+　　　rhtml = rhtml + "</TD></TR>";
+   }
+
+
+  }
+
+
+  rhtml = rhtml + "</table>";
 
   return rhtml;
   //var description = e.features[0].properties["user"];
 }
 
+
+function CreatePropertiesHTML( features  ){
+  if ( features.length > 0 ) {
+
+　　　var  rethtml = " ";
+
+     for ( var  feature of features ){
+         var thtml = CreatePropertyHTML( feature.properties );
+
+         rethtml = rethtml + thtml;
+        
+     }
+
+     return rethtml;
+
+  }
+  else {
+    return( "無し")
+  }
+
+}
 
 
 
