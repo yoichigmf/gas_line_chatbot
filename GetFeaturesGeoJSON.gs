@@ -109,6 +109,7 @@ function GetFeaturesGeoJSON( sheetname ){
                 //geom["type"] = "Point";
 //   id: arkey,
                  var feature = { 
+                   　　　　　　　　id: arkey,
                                 type:'Feature',
                                 geometry:geom ,
                                 properties: prop };

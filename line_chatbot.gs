@@ -626,6 +626,8 @@ function doGet(e) {
 
   let  CMD = e.parameter['cmd'];
 
+  if ( CMD != undefined) {
+
   //  シートリストの取得
   if ( CMD.toUpperCase() == 'GETSHEETS'){
 
@@ -691,6 +693,8 @@ function doGet(e) {
 
 
    return htmlOutput;
+  }
+
   }
 
 

@@ -81,12 +81,42 @@ left: 20px;
 z-index:255;
 }
 
+#hbutton {
+  position: absolute;
+  top: 0px;
+left: 0px;
+right: 0px;
+heiht: 100px;
+z-index:255;
+}
+
+.mapboxgl-popup {
+max-width: 400px;
+font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
 
 </style>
 </head>
 <body>
  
 <div id='map'>
+<!--
+    <div data-role="navbar"  id="hbutton" >
+            <ul>
+                <li><a href="#nav_panel" id="move_display"  class="ui-btn ui-btn-icon-top ui-icon-navigation">位置指定</a>
+                     </li>
+                <li><a href="#panel" id="CONTACTS" class="ui-btn ui-btn-icon-top  ui-icon-grid">シート選択</a>
+           </li>
+                <li><a href="#panel_r" id="TRIPS"  class="ui-btn  ui-btn-icon-top  ui-icon-info">情報選択</a>
+           </li>
+                <li><a href="JavaScript:OpenLayerProp()"  class="ui-btn  ui-btn-icon-top ui-icon-location">地図指定</a>
+           </li>
+
+         </ul>
+     </div>  
+     -->
+     <!--  navbar -->
+
   <div id="basemaps-selecter">
 
             <select id="basemaps">
@@ -107,7 +137,7 @@ var map = new maplibregl.Map({
   container: 'map',
   hash: true,
   style: 'https://raw.githubusercontent.com/gsi-cyberjapan/optimal_bvmap/main/style/skeleton.json', //style.jsonへのパス
-  center: [139.767144, 35.680621],  
+  center: [139.408658, 35.698769],  
   zoom: 15,
   maxZoom: 17.99,
   minZoom: 4,
@@ -121,6 +151,8 @@ map.addControl(new maplibregl.ScaleControl() );
 
 
 map.on('load', function () {
+
+
 map.addSource('gsi_raster', {
   
                     'type': 'raster',
@@ -142,11 +174,78 @@ map.addLayer({
                         'layout':{
                                 'visibility':'none'
                                 },
-                         paint:{   "raster-opacity": 1.0}
+                         paint:{  'raster-opacity': 1.0}
 
                         });
 
+
+
+
+map.addSource( 
+        'rpoints', {
+        'type': 'geojson',
+         'data':'https://script.google.com/macros/s/AKfycbwvROUTmO3FkehnHRsnTntX_LyI_Tf8_7PSSsjie471XrTA93gn2jG8XRmXuN-1nKLk1Q/exec?cmd=GETFEATURS'
+        }
+
+);
+//'./sprite/pin3.png',
+//https://drive.google.com/file/d/1cFPBC57nxPHeJgHgLnfqv3PFro1YRNBN/view?usp=sharing
+//'https://upload.wikimedia.org/wikipedia/commons/7/7c/201408_cat.png',
+map.loadImage(
+  'https://raw.githubusercontent.com/yoichigmf/lbmap/8adf0259ee93fa81f69a2ca4cbe3d1b4da69a50f/sprite/pin3.png',
+function (error, image) {
+if (error) throw error;
+map.addImage('pin', image);
+
+
+
+map.addLayer({
+'id': 'points',
+'type': 'symbol',
+'source': 'rpoints',
+'layout': {
+'icon-image': 'pin',
+'icon-size': 0.1
+}
 });
+
+
+}
+);
+
+
+
+
+  map.on('click', 'points', function (e) {
+        var coordinates = e.features[0].geometry.coordinates.slice();
+//var description = e.features[0].properties.description;
+
+       var description = e.features[0].properties["user"];
+
+       console.log('A click event occurred.');
+
+ 
+// Ensure that if the map is zoomed out such that multiple
+// copies of the feature are visible, the popup appears
+// over the copy being pointed to.
+//while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+//coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+//}
+ 
+new maplibregl.Popup()
+.setLngLat(coordinates)
+.setHTML(description)
+.addTo(map);
+
+  });
+
+
+
+});
+
+
+
+
 
 
  
