@@ -180,17 +180,19 @@ map.addLayer({
 
 
 
+ var 　dpurl = <?= GetDeployURL(); ?>;
 
+ var   GetFURL  = dpurl + "?cmd=GETFEATURS";
+
+//  'https://script.google.com/macros/s/AKfycbwvROUTmO3FkehnHRsnTntX_LyI_Tf8_7PSSsjie471XrTA93gn2jG8XRmXuN-1nKLk1Q/exec?cmd=GETFEATURS'
 map.addSource( 
         'rpoints', {
         'type': 'geojson',
-         'data':'https://script.google.com/macros/s/AKfycbwvROUTmO3FkehnHRsnTntX_LyI_Tf8_7PSSsjie471XrTA93gn2jG8XRmXuN-1nKLk1Q/exec?cmd=GETFEATURS'
+         'data':GetFURL  
         }
 
 );
-//'./sprite/pin3.png',
-//https://drive.google.com/file/d/1cFPBC57nxPHeJgHgLnfqv3PFro1YRNBN/view?usp=sharing
-//'https://upload.wikimedia.org/wikipedia/commons/7/7c/201408_cat.png',
+
 map.loadImage(
   'https://raw.githubusercontent.com/yoichigmf/lbmap/8adf0259ee93fa81f69a2ca4cbe3d1b4da69a50f/sprite/pin3.png',
 function (error, image) {
@@ -220,7 +222,11 @@ map.addLayer({
         var coordinates = e.features[0].geometry.coordinates.slice();
 //var description = e.features[0].properties.description;
 
-       var description = e.features[0].properties["user"];
+   
+
+       
+       var description = CreatePropertyHTML( e.features[0].properties);
+
 
        console.log('A click event occurred.');
 
@@ -243,6 +249,36 @@ new maplibregl.Popup()
 
 });
 
+
+
+
+function  CreatePropertyHTML( prp ){
+
+  var rhtml = "<table><TR><TH>項目</TH><TH>値</TH></TR>";
+
+
+  rhtml = rhtml + "<TR><TD>ユーザ名</TD><TD>";
+
+  rhtml = rhtml + prp["user"];
+  rhtml = rhtml + "</TD></TR>";
+
+  rhtml = rhtml + "<TR><TD>日時</TD><TD>";
+
+rhtml = rhtml + prp["date"];
+rhtml = rhtml + "</TD></TR>";
+
+
+rhtml = rhtml + "<TR><TD>住所</TD><TD>";
+
+rhtml = rhtml + prp["text"];
+rhtml = rhtml + "</TD></TR>";
+
+
+  rhtml = rhtml + "<//table>";
+
+  return rhtml;
+  //var description = e.features[0].properties["user"];
+}
 
 
 

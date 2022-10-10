@@ -67,6 +67,14 @@ function make_filename_path( kind, ext ){  //  make unique file name full path
 }
 
 
+//   最新デプロイURLを返す
+function GetDeployURL(){
+ var webapps = ScriptApp.getService().getUrl();
+
+ return webapps;
+
+}
+
  function send2dropbox(file) {
   var dropboxTOKEN =  DROPBOX_TOKEN ;
 
@@ -864,8 +872,29 @@ function doPost(e) {
 
           //  #comment   
 
+          let msg = event.message.text;
 
+          if(msg.substr(0,1)== '#') {
+
+　　　　　　　　let lmsg = msg.toLowerCase();
+
+             let mapurl = GetDeployURL() + "?cmd=MAP"
+
+             if ( lmsg == "#map"){
+               　sendMsg(REPLY_URL, {
+                  'replyToken': event.replyToken,
+                'messages': [{
+                 'type': 'text',
+                'text': '地図表示　' +  mapurl ,
+                 }]
+                }); //  sendMsg
+             }
+
+
+          }
+          else {
           recordText(username, event.timestamp, event.message.text, event);
+
       　　 if (true) {
           　sendMsg(REPLY_URL, {
             'replyToken': event.replyToken,
@@ -873,10 +902,12 @@ function doPost(e) {
               'type': 'text',
               'text': 'テキストメッセージ 　' +  event.message.text ,
             }]
-          });
-        }
+          }); //  sendMsg
+        }  // if true
 
-      }
+        } //  if # else
+
+      }  // try
       catch (e) {
         Console.log(e);
       }
