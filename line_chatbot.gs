@@ -19,6 +19,29 @@ const FOLDER_ID = ScriptProperties.getProperty('FOLDER_ID');
 //LINE返信用エンドポイント
 const REPLY_URL = 'https://api.line.me/v2/bot/message/reply';
 
+function onOpen() {
+    var murl = mapDisplayURL();
+
+    var pSheet = getPropetySheet();
+
+    pSheet.getRange(7, 2).setValue(murl);
+
+
+}
+
+function  mapDisplayURL(){
+
+    var curl = GetDeployURL();
+
+    var url = curl + "?cmd=MAP";
+
+
+  
+    return url;
+
+
+}
+
 
 function  getPropetySheet(){
 
@@ -696,7 +719,7 @@ function doGet(e) {
    var htmlOutput = HtmlService.createTemplateFromFile("index").evaluate();
 
      htmlOutput
-    .setTitle("地図表示テスト")
+    .setTitle("地図表示")
     .addMetaTag('viewport', 'width=device-width, initial-scale=1')
 
 

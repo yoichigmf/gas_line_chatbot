@@ -90,7 +90,7 @@ function GetFeaturesGeoJSON( sheetname ){
 
                 let arkey = userd + "_" + ckey ;
                 
-                let atrar = [];
+                let atrar = new Array();
 
               
                 //feature["id"] = arkey;
@@ -107,7 +107,7 @@ function GetFeaturesGeoJSON( sheetname ){
                    kind: kind,
                    text:stext,
                    url: url,
-                   proplist: []
+                   proplist: atrar
                   };
 
 
