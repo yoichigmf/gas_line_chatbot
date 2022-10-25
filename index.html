@@ -193,8 +193,15 @@ map.addSource(
 
 );
 
+
+
+
+//  'https://raw.githubusercontent.com/yoichigmf/lbmap/8adf0259ee93fa81f69a2ca4cbe3d1b4da69a50f/sprite/pin3.png',
+
+
+
 map.loadImage(
-  'https://raw.githubusercontent.com/yoichigmf/lbmap/8adf0259ee93fa81f69a2ca4cbe3d1b4da69a50f/sprite/pin3.png',
+  'https://raw.githubusercontent.com/yoichigmf/lbmap/511c8c3b03f785025f33c3e77ca313e72c1e737e/sprite/marker.png',
 function (error, image) {
 if (error) throw error;
 map.addImage('pin', image);
@@ -207,7 +214,7 @@ map.addLayer({
 'source': 'rpoints',
 'layout': {
 'icon-image': 'pin',
-'icon-size': 0.1
+'icon-size': 0.7
 }
 });
 
@@ -274,21 +281,43 @@ rhtml = rhtml + prp["text"];
 rhtml = rhtml + "</TD></TR>";
 
 
-if ( prp["proplist"].length > 0 ){
+var pobj = JSON.parse(prp["proplist"]);
+
+<!--
+rhtml = rhtml + "<TR><TD>text</TD><TD>";
+
+rhtml = rhtml + " size =" + prp["proplist"].length  + " ";
+rhtml = rhtml + prp["proplist"];
+
+rhtml = rhtml + "</TD></TR>";
+-->
+
+if ( pobj.length > 0 ){
 
 
-   for ( var rec of  prp["proplist"] ) {
-      rhtml = rhtml + "<TR><TD>種別</TD><TD>";
+   for ( var rec of  pobj ) {
+      rhtml = rhtml + "<TR><TD>日時</TD><TD>";
 
       
-      rhtml = rhtml + rec["kind"];
+      rhtml = rhtml + rec["date"];
       rhtml = rhtml + "</TD></TR>";
 
+      if ( rec["kind"] == "image"){
+           rhtml = rhtml + "<TR><TD>画像</TD><TD>";
 
-       rhtml = rhtml + "<TR><TD>ユーザ</TD><TD>";
+      　　　rhtml = rhtml + "<img=\"src\"=\""+rec["url"] + "\" />";
 
-      rhtml = rhtml + rec["user"];
+           rhtml = rhtml + rec["url"];
+
+           rhtml = rhtml + "</TD></TR>";
+      }
+      if ( rec["kind"] == "text"){
+
+      rhtml = rhtml + "<TR><TD>text</TD><TD>";
+
+      rhtml = rhtml + rec["text"];
       rhtml = rhtml + "</TD></TR>";
+      }
    }
 
 
