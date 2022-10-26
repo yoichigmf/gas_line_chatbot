@@ -283,14 +283,13 @@ rhtml = rhtml + "</TD></TR>";
 
 var pobj = JSON.parse(prp["proplist"]);
 
-<!--
-rhtml = rhtml + "<TR><TD>text</TD><TD>";
 
-rhtml = rhtml + " size =" + prp["proplist"].length  + " ";
-rhtml = rhtml + prp["proplist"];
+//rhtml = rhtml + "<TR><TD>text</TD><TD>";
 
-rhtml = rhtml + "</TD></TR>";
--->
+//rhtml = rhtml + " size =" + prp["proplist"].length  + " ";
+//rhtml = rhtml + prp["proplist"];
+
+//rhtml = rhtml + "</TD></TR>";
 
 if ( pobj.length > 0 ){
 
@@ -305,9 +304,12 @@ if ( pobj.length > 0 ){
       if ( rec["kind"] == "image"){
            rhtml = rhtml + "<TR><TD>画像</TD><TD>";
 
-      　　　rhtml = rhtml + "<img=\"src\"=\""+rec["url"] + "\" />";
+           var tgurl = MakeDirectURL( rec["url"]);
 
-           rhtml = rhtml + rec["url"];
+
+      　　　rhtml = rhtml + "<img src=\""+ tgurl + "\"  width=\"200\" />";
+
+          // rhtml = rhtml + tgurl;
 
            rhtml = rhtml + "</TD></TR>";
       }
@@ -328,6 +330,18 @@ if ( pobj.length > 0 ){
 
   return rhtml;
   //var description = e.features[0].properties["user"];
+}
+
+// change dropbox url 
+function MakeDirectURL( url ){
+
+  
+     nurl  = url.replace("www.dropbox.com", "dl.dropboxusercontent.com");
+
+     nnurl = nurl.replace('?dl=0', '');
+
+return nnurl;
+
 }
 
 
