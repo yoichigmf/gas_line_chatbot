@@ -157,36 +157,6 @@ function make_filename( kind, ext ){  //  make unique file name
 }
 
 
-function testbinupload(){
-    const folderId ='1_G2VZkqqXFo6OQ9zuAHy5icmwsrEtk3g';
-    const folder = DriveApp.getFolderById(folderId);
-    Logger.log( folder.getName());
-    
-    var tgfiles = folder.getFilesByName('1661572752303.jpg');
-    //var tgfiles = folder.getFiles();
-
-
-    appname = "sample";
-    kind = "image";
-    ext = "jpg";
-
-    while( tgfiles.hasNext()){
-      var tgf = tgfiles.next();
-      Logger.log( tgf.getName());
-
-      filename = make_filename( kind, ext );
-
-      tgfilename = "/disasterinfo/" + appname + "/" + kind +"/" + filename ;
-
-      Logger.log( tgfilename);
-      resultf = tgfilename;
-      let bdata = tgf.getBlob().getBytes();
-      ret = uploadBindataToDropbox(bdata, resultf ) ;
-
-     Logger.log( ret );
-    }
-}
-
 //  バイナリデータをDropBoxに保存する
 
 function uploadBindataToDropbox( bindata, resultfilename ) {
@@ -490,7 +460,7 @@ function recordText(userId, timestamp, tgText) {
   mySheet.getRange(1 + lastRow, 3).setValue("text");
   //mySheet.getRange(1 + lastRow, 3).setValue(id);
   mySheet.getRange(1 + lastRow, 5).setValue(tgText);
-  mySheet.getRange(1 + lastRow, 8).setValue('LINE');
+  mySheet.getRange(1 + lastRow, 8).setValue('line');
   return 0;
  
 }

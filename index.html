@@ -284,12 +284,13 @@ rhtml = rhtml + "</TD></TR>";
 var pobj = JSON.parse(prp["proplist"]);
 
 
-//rhtml = rhtml + "<TR><TD>text</TD><TD>";
+rhtml = rhtml + "<TR><TD>text</TD><TD>";
 
 //rhtml = rhtml + " size =" + prp["proplist"].length  + " ";
-//rhtml = rhtml + prp["proplist"];
+rhtml = rhtml + pobj.length;
 
-//rhtml = rhtml + "</TD></TR>";
+
+rhtml = rhtml + "</TD></TR>";
 
 if ( pobj.length > 0 ){
 
@@ -313,6 +314,20 @@ if ( pobj.length > 0 ){
 
            rhtml = rhtml + "</TD></TR>";
       }
+
+       if ( rec["kind"] == "video"){
+           rhtml = rhtml + "<TR><TD>動画</TD><TD>";
+
+          // var tgurl = MakeDirectURL( rec["url"]);
+
+
+      　　//　rhtml = rhtml + "<img src=\""+ tgurl + "\"  width=\"200\" />";
+
+           rhtml = rhtml + "<a href=\"" + rec["url"] + "\" target=\"movp\">動画</a>";
+
+           rhtml = rhtml + "</TD></TR>";
+      }
+
       if ( rec["kind"] == "text"){
 
       rhtml = rhtml + "<TR><TD>text</TD><TD>";
