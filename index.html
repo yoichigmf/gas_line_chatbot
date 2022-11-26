@@ -100,22 +100,7 @@ font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
 <body>
  
 <div id='map'>
-<!--
-    <div data-role="navbar"  id="hbutton" >
-            <ul>
-                <li><a href="#nav_panel" id="move_display"  class="ui-btn ui-btn-icon-top ui-icon-navigation">位置指定</a>
-                     </li>
-                <li><a href="#panel" id="CONTACTS" class="ui-btn ui-btn-icon-top  ui-icon-grid">シート選択</a>
-           </li>
-                <li><a href="#panel_r" id="TRIPS"  class="ui-btn  ui-btn-icon-top  ui-icon-info">情報選択</a>
-           </li>
-                <li><a href="JavaScript:OpenLayerProp()"  class="ui-btn  ui-btn-icon-top ui-icon-location">地図指定</a>
-           </li>
 
-         </ul>
-     </div>  
-     -->
-     <!--  navbar -->
 
   <div id="basemaps-selecter">
 
@@ -182,9 +167,9 @@ map.addLayer({
 
  var 　dpurl = <?= GetDeployURL(); ?>;
 
- var   GetFURL  = dpurl + "?cmd=GETFEATURS";
+ var   GetFURL  = dpurl + "?cmd=GETFEATURES";
 
-//  'https://script.google.com/macros/s/AKfycbwvROUTmO3FkehnHRsnTntX_LyI_Tf8_7PSSsjie471XrTA93gn2jG8XRmXuN-1nKLk1Q/exec?cmd=GETFEATURS'
+//  'https://script.google.com/macros/s/AKfycbwvROUTmO3FkehnHRsnTntX_LyI_Tf8_7PSSsjie471XrTA93gn2jG8XRmXuN-1nKLk1Q/exec?cmd=GETFEATURES'
 map.addSource( 
         'rpoints', {
         'type': 'geojson',
@@ -194,9 +179,6 @@ map.addSource(
 );
 
 
-
-
-//  'https://raw.githubusercontent.com/yoichigmf/lbmap/8adf0259ee93fa81f69a2ca4cbe3d1b4da69a50f/sprite/pin3.png',
 
 
 
