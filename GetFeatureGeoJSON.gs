@@ -1,4 +1,3 @@
-
 function testGetGJSON(){
 
   var tg = GetFeaturesGeoJSON("シート1");

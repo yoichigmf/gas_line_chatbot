@@ -28,7 +28,7 @@ function onOpen() {
 
 
 }
-
+//  sample
 function  mapDisplayURL(){
 
     var curl = GetDeployURL();
@@ -627,6 +627,11 @@ function doGet(e) {
 
   let  CMD = e.parameter['cmd'];
 
+  if ( CMD == undefined ) {
+       let  CMD = e.parameter['CMD'];
+
+  }
+
   if ( CMD != undefined) {
 
   //  シートリストの取得
@@ -642,7 +647,7 @@ function doGet(e) {
 
 
   }　
-  else if (CMD.toUpperCase() == 'GETFEATURS'){
+  else if (CMD.toUpperCase() == 'GETFEATURES'){
     //   地物の取得
 
 　　　let  tgsheet = e.parameter['sheet'] ? e.parameter['sheet']:false;
