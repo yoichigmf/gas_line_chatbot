@@ -14,6 +14,9 @@ const DROPBOX_TOKEN = getPropetySheet().getRange(2, 2).getValue();
 
 const APPNAME = getPropetySheet().getRange(4, 2).getValue();
 
+
+const SLACK_URL = getPropetySheet().getRange(8, 2).getValue();
+
 //Googleドライブに作ったフォルダのURL
 const FOLDER_ID = ScriptProperties.getProperty('FOLDER_ID');
 //LINE返信用エンドポイント
@@ -461,8 +464,82 @@ function recordText(userId, timestamp, tgText) {
   //mySheet.getRange(1 + lastRow, 3).setValue(id);
   mySheet.getRange(1 + lastRow, 5).setValue(tgText);
   mySheet.getRange(1 + lastRow, 8).setValue('line');
+
+  PostSlackText( userid, timestamp, tgText );
   return 0;
  
+}
+
+function TestPostSlack(){
+    // PostSlackText( "yoichi", Date(), "sample ");
+
+    //PostSlackLocation( "yoichi", Date(), 35.4, 134.3, "東京");
+
+     PostSlackImg( "yoichi",Date(), "https://www.dropbox.com/s/vdy15yiv4rsftw7/image-iFnmRj.jpg?dl=1" );
+}
+
+function PostSlackText( userid, timestamp , tgtext ){
+  if ( SLACK_URL　=== ""){
+     Logger.log("slack url is blank");
+  }
+  else {
+      
+
+      timestr = Utilities.formatDate(new Date(timestamp), 'JST', 'yyyy-MM-dd HH:mm:ss');
+      tgtext = timestr + " " + userid + " " + tgtext;
+
+      Logger.log(tgtext);
+
+      var jsonData =
+       {
+
+          "text" : tgtext
+       };
+       var payload = JSON.stringify(jsonData);
+
+      var options =
+        {
+         "method" : "post",
+         "contentType" : "application/json",
+         "payload" : payload
+        };
+
+  UrlFetchApp.fetch(SLACK_URL, options);
+
+  }
+}
+
+
+
+function PostSlackLocation( userid, timestamp , lat, lon, address  ){
+  if ( SLACK_URL　=== ""){
+     Logger.log("slack url is blank");
+  }
+  else {
+      
+
+      timestr = Utilities.formatDate(new Date(timestamp), 'JST', 'yyyy-MM-dd HH:mm:ss');
+      tgtext = timestr + " " + userid + " " + address + " " + lat + " " + lon ;
+
+      Logger.log(tgtext);
+
+      var jsonData =
+       {
+
+          "text" : tgtext
+       };
+       var payload = JSON.stringify(jsonData);
+
+      var options =
+        {
+         "method" : "post",
+         "contentType" : "application/json",
+         "payload" : payload
+        };
+
+  UrlFetchApp.fetch(SLACK_URL, options);
+
+  }
 }
 
 
@@ -497,9 +574,51 @@ function  recordImg(username, timestamp, fileurl, event){
   mySheet.getRange(1 + lastRow, 5).setValue(imgurl);
   //mySheet.getRange(1 + lastRow, 7).setValue(lon);
   mySheet.getRange(1 + lastRow, 8).setValue('line');
+
+  PostSlackImg( username, timestamp, imgurl );
+
   return 0;
 
 }
+
+
+
+
+function PostSlackImg( userid, timestamp , url ){
+  if ( SLACK_URL　=== ""){
+     Logger.log("slack url is blank");
+  }
+  else {
+      
+
+      timestr = Utilities.formatDate(new Date(timestamp), 'JST', 'yyyy-MM-dd HH:mm:ss');
+      tgtext = timestr + " " + userid  ;
+
+      Logger.log(tgtext);
+
+      var jsonData =
+       {
+
+          "text" : tgtext,
+          "attachments" : [{
+           
+            "image_url": url,
+          }]
+       };
+       var payload = JSON.stringify(jsonData);
+
+      var options =
+        {
+         "method" : "post",
+         "contentType" : "application/json",
+         "payload" : payload
+        };
+
+  UrlFetchApp.fetch(SLACK_URL, options);
+
+  }
+}
+
 
 function  recordMov(username, timestamp, fileurl, event){
   const mySheet = getTargetSheet();
