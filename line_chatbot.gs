@@ -465,7 +465,7 @@ function recordText(userId, timestamp, tgText) {
   mySheet.getRange(1 + lastRow, 5).setValue(tgText);
   mySheet.getRange(1 + lastRow, 8).setValue('line');
 
-  PostSlackText( userid, timestamp, tgText );
+  PostSlackText( userId, timestamp, tgText );
   return 0;
  
 }
@@ -556,6 +556,9 @@ function recordLocation(userId, timestamp, lat, lon, address) {
   mySheet.getRange(1 + lastRow, 6).setValue(lat);
   mySheet.getRange(1 + lastRow, 7).setValue(lon);
   mySheet.getRange(1 + lastRow, 8).setValue('line');
+
+  
+  PostSlackLocation( userId, timestamp , lat, lon, address  )
   return 0;
  
 }
@@ -570,12 +573,13 @@ function  recordImg(username, timestamp, fileurl, event){
 
   mySheet.getRange(1 + lastRow, 4).setValue(fileurl);
   imgurl = fileurl.replace("dl=0", "dl=1");
+  img2 = imgurl;
   imgurl = "=image(\"" + imgurl + "\")";
   mySheet.getRange(1 + lastRow, 5).setValue(imgurl);
   //mySheet.getRange(1 + lastRow, 7).setValue(lon);
   mySheet.getRange(1 + lastRow, 8).setValue('line');
 
-  PostSlackImg( username, timestamp, imgurl );
+  PostSlackImg( username, timestamp, img2);
 
   return 0;
 
