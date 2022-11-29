@@ -29,17 +29,17 @@ function onOpen() {
       .addItem('地図を開く', 'openMapUrl')　//メニューアイテムを追加
       .addToUi()
 
-    var murl = mapDisplayURL();
+    //var murl = mapDisplayURL();
 
-    var pSheet = getPropetySheet();
+    //var pSheet = getPropetySheet();
 
-    pSheet.getRange(7, 2).setValue(murl);
+    //pSheet.getRange(7, 2).setValue(murl);
 
 
 }
 
 function openMapUrl(){
-  let html = '<h1>Dummy Dialog</h1><script>window.onload = function(){google.script.run.withSuccessHandler(function(url){window.open(url,"_blank");google.script.host.close();}).mapDisplayURL();}</script>';
+  let html = '<h1>地図</h1><script>window.onload = function(){google.script.run.withSuccessHandler(function(url){window.open(url,"_blank");google.script.host.close();}).mapDisplayURL();}</script>';
   SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(html),"地図を開きます");
 }
 
@@ -48,7 +48,7 @@ function openMapUrl(){
 function  mapDisplayURL(){
 
     var curl = GetDeployURL();
-    curl = "https://script.google.com/macros/s/AKfycbxQieUAxY6ivfG8kRq8RINW-J0iz621K_qgOQzN99elmvT_qCosT9HHgS8PgSeRtWW-Kw/exec";
+   // curl = "https://script.google.com/macros/s/AKfycbxQieUAxY6ivfG8kRq8RINW-J0iz621K_qgOQzN99elmvT_qCosT9HHgS8PgSeRtWW-Kw/exec";
 
     var url = curl + "?cmd=MAP";
 
@@ -107,9 +107,14 @@ function make_filename_path( kind, ext ){  //  make unique file name full path
 }
 
 
-//   最新デプロイURLを返す
+//   最新デプロイURLを返す   手動で設定することにした
 function GetDeployURL(){
- var webapps = ScriptApp.getService().getUrl();
+
+  var pSheet = getPropetySheet();
+
+   var webapps = pSheet.getRange(7, 2).getValue();
+
+// var webapps = ScriptApp.getService().getUrl();
 
  return webapps;
 
