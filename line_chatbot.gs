@@ -23,6 +23,12 @@ const FOLDER_ID = ScriptProperties.getProperty('FOLDER_ID');
 const REPLY_URL = 'https://api.line.me/v2/bot/message/reply';
 
 function onOpen() {
+
+    const customMenu = SpreadsheetApp.getUi()
+  　customMenu.createMenu('地図機能')　//メニューバーに表示するカスタムメニュー名
+      .addItem('地図を開く', 'openMapUrl')　//メニューアイテムを追加
+      .addToUi()
+
     var murl = mapDisplayURL();
 
     var pSheet = getPropetySheet();
@@ -31,10 +37,18 @@ function onOpen() {
 
 
 }
+
+function openMapUrl(){
+  let html = '<h1>Dummy Dialog</h1><script>window.onload = function(){google.script.run.withSuccessHandler(function(url){window.open(url,"_blank");google.script.host.close();}).mapDisplayURL();}</script>';
+  SpreadsheetApp.getUi().showModelessDialog(HtmlService.createHtmlOutput(html),"地図を開きます");
+}
+
+
 //  sample
 function  mapDisplayURL(){
 
     var curl = GetDeployURL();
+    curl = "https://script.google.com/macros/s/AKfycbxQieUAxY6ivfG8kRq8RINW-J0iz621K_qgOQzN99elmvT_qCosT9HHgS8PgSeRtWW-Kw/exec";
 
     var url = curl + "?cmd=MAP";
 
