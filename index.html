@@ -1,109 +1,183 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta content="text/html; charset=utf-8" http-equiv="Content-Type"/>
-    <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
-    <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
-    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+  <head>
+    <meta charset="UTF-8" />
+    <title>災害情報収集システム</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
     <!--
-    <script src="https://unpkg.com/flatgeobuf@3.22.0/dist/flatgeobuf-geojson.min.js"></script>
+    <link rel="stylesheet" href="styles/reset.min.css" />
     -->
     <style>
-        body { margin:0; padding:0; }
+html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}table{border-collapse:collapse;border-spacing:0}
+  
+    </style>
 
- 
+    <style>
+@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
+.wrapper {
+  max-width: 1140px;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  margin-left: auto;
+  margin-right: auto;
+}
 
-#map {
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
+a {
+  text-decoration: none;
+  color: #222;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  font-family: "Roboto", sans-serif;
+}
+
+.sr-only {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 100%;
-  z-index:10;
+  clip: rect(1px, 1px, 1px, 1px);
+  padding: 0;
+  border: 0;
+  height: 1px;
+  width: 1px;
+  overflow: hidden;
 }
 
-#basemaps-selecter {
-        position: absolute;
-        top: 60px;
-        left: 20px;
-        background: rgba(255, 255, 255, 0);
-        z-index:255;
-      }
-      #basemaps {
-        font-size: 16px;
-        padding: 4px 8px;
-      }
-
-#tablearea {
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  height: 200px;
-  z-index:255;
-  box-shadow: 0 0 50px -25px black;
-  background: white;
-  display:none;
-
+.button {
+  -webkit-appearance: none;
+     -moz-appearance: none;
+          appearance: none;
+  color: #fff;
+  background-color: #2fa0f6;
+  min-width: 120px;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  text-align: center;
 }
-#elink{  
-  font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+
+.button svg {
+  display: inline-block;
+  vertical-align: middle;
+  width: 24px;
+  height: 24px;
+  fill: #fff;
 }
+
+.button span {
+  display: none;
+}
+
+@media (min-width: 600px) {
+  .button span {
+    display: initial;
+  }
+}
+
+.button--icon {
+  min-width: initial;
+  padding: 0.5rem;
+}
+
 
 </style>
 
 <style>
-  .listing-group {
-  font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  font-weight: 600;
-  position: absolute;
-  top:  120px;
-  left: 10px;
-  z-index: 1;
-  border-radius: 3px;
-  max-width: 100%;
-  color: #fff;
-  }
-   
-  .listing-group input[type='checkbox']:first-child + label {
-  border-radius: 3px 3px 0 0;
-  }
-   
-  .listing-group label:last-child {
-  border-radius: 0 0 3px 3px;
-  border: none;
-  }
-   
-  .listing-group input[type='checkbox'] {
-  display: none;
-  }
-   
-  .listing-group input[type='checkbox'] + label {
-  background-color: #3386c0;
+.brand {
+  font-weight: bold;
+  font-size: 20px; }
+
+.site-header {
+  position: relative;
+  background-color: #def7ff; }
+
+.site-header__wrapper {
+  padding-top: 1rem;
+  padding-bottom: 1rem; }
+  @media (min-width: 600px) {
+    .site-header__wrapper {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0;
+      padding-bottom: 0; } }
+@media (min-width: 600px) {
+  .nav__wrapper {
+    display: flex; } }
+
+@media (max-width: 599px) {
+  .nav__wrapper {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    left: 0;
+    z-index: -1;
+    background-color: #d9f0f7;
+    visibility: hidden;
+    opacity: 0;
+    transform: translateY(-100%);
+    transition: transform 0.3s ease-out, opacity 0.3s ease-out; }
+    .nav__wrapper.active {
+      visibility: visible;
+      z-index:5;
+      opacity: 1;
+      transform: translateY(0); } }
+
+.nav__item a {
   display: block;
-  cursor: pointer;
-  padding: 10px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-  }
-   
-  .listing-group input[type='checkbox'] + label {
-  background-color: #3386c0;
-  text-transform: capitalize;
-  }
-   
-  .listing-group input[type='checkbox'] + label:hover,
-  .listing-group input[type='checkbox']:checked + label {
-  background-color: #4ea0da;
-  }
-   
-  .listing-group input[type='checkbox']:checked + label:before {
-  content: '✔';
-  margin-right: 5px;
-  }
+  padding: 1.5rem 1rem; }
+
+.nav__toggle {
+  display: none; 
+  z-index:5;
+
+}
+  @media (max-width: 599px) {
+    .nav__toggle {
+      display: block;
+      position: absolute;
+      right: 1rem;
+      top: 1rem;
+      z-index:10000;
+     } }
+
+
+</style>
+
+  
+  
+
+    <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
+    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+
+
+  <style>
+   body { margin:0; padding:0; }
+
+#map {
+  position: absolute;
+  top: 60px;
+  bottom: 0;
+  width: 100%;
+  z-index:1;
+}
+
+
 
   </style>
 
+  <style>
 
 
-<style>
     .rounded-rect {
     background: white;
     border-radius: 10px;
@@ -176,599 +250,567 @@
     transform: translateX(295px);
     }
 
-    
-#header {
+  </style>
 
-  height: 64px;
+<style>
+  .listing-group {
+  font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+  font-weight: 600;
   position: absolute;
-  top: 0px;
-  background-color: #333333aa;
-  width: 100%;
-  text-align: center;
-  z-index: 2;
-  box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.25);
-      }
+  top:  120px;
+  left: 10px;
+  z-index: 1;
+  border-radius: 3px;
+  max-width: 100%;
+  color: #fff;
+  }
+   
+  .listing-group input[type='checkbox']:first-child + label {
+  border-radius: 3px 3px 0 0;
+  }
+   
+  .listing-group label:last-child {
+  border-radius: 0 0 3px 3px;
+  border: none;
+  }
+   
+  .listing-group input[type='checkbox'] {
+  display: none;
+  }
+   
+  .listing-group input[type='checkbox'] + label {
+  background-color: #3386c0;
+  display: block;
+  cursor: pointer;
+  padding: 10px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+  }
+   
+  .listing-group input[type='checkbox'] + label {
+  background-color: #3386c0;
+  text-transform: capitalize;
+  }
+   
+  .listing-group input[type='checkbox'] + label:hover,
+  .listing-group input[type='checkbox']:checked + label {
+  background-color: #4ea0da;
+  }
+   
+  .listing-group input[type='checkbox']:checked + label:before {
+  content: '✔';
+  margin-right: 5px;
+  }
 
-      a {
-    color: #fff;
-    text-transform: uppercase;
-}
-
-ul {
-    overflow:hidden;
-    list-style:none;
-    margin: 0 auto;
-    z-index: 6;
-}
-
-
-
-a {
-    color: #fff;
-    text-transform: uppercase;
-}
-
-ul {
-    overflow:hidden;
-    list-style:none;
-    margin: 0 auto;
-    z-index: 20;
-}
-
-ul li {
-    display: inline-block;
-    padding: 5px 10px 5px 10px;
-}
-
-ul li:hover {
-    -webkit-transform-origin: left top;
-    -ms-transform-origin: left top;
-    transform-origin: left top;
-    -webkit-transform: scale(1, 1);
-    -ms-transform: scale(1, 1);
-    transform: scale(1, 1)
-}
-.spaser{
-    height: 50px;
-}
+  </style>
 
 
+  </head>
+  <body>
+    <!-- Header Start -->
+    <header class="site-header">
+      <div class="wrapper site-header__wrapper">
+        <a href="#" class="brand">災害情報収集システム</a>
+        <nav class="nav">
+          <button class="nav__toggle" aria-expanded="false" type="button">
+            menu
+          </button>
+          <ul class="nav__wrapper">
+            <li class="nav__item"><a href="#">表示位置指定</a></li>
+            <li class="nav__item"><a href="#">データシート指定</a></li>
+            <li class="nav__item"><a href="#">表示情報指定</a></li>
+            <li class="nav__item"><a href="#"   onclick="toggleSidebar('right')"   >表示地図指定</a></li>
+            <!--
+            <li class="nav__item"><a href="#">Contact</a></li>
+            -->
+          </ul>
+        </nav>
+      </div>
+    </header>
+    <!-- Header End -->
 
-.btn {
- padding: 2px 5px;
- background: #cbb403;
- color: #111111;
- border-bottom: solid 5px gray;
- border-radius: 4px;
-}
-.btn:active {
- -webkit-transform: translateY(5px);
- transform: translateY(5px);
- border-bottom: none;
-}
-    </style>
-</head>
-<body>
+
 
 
 
     <div id="map">
 
-      <div id="header">
-        <ul>
-        <li><button type="button" onclick="toggleSidebar('left')" class="btn">表示位置指定</button></li>
-        <li><button type="button" onclick="toggleSidebar('left')" class="btn">データシート指定</button></li>
-        <li><button type="button" onclick="toggleSidebar('right')" class="btn">表示情報指定</button></li>
-        <li><button type="button" onclick="toggleSidebar('right')" class="btn">表示地図指定</button></li>
-        <!--
-        <li><a href="#"  onclick="toggleSidebar('left')" >表示位置指定</a></li>
-        <li><a href="#"   onclick="toggleSidebar('left')">データシート指定</a></li>
-  
-        <li><a href="#"   onclick="toggleSidebar('right')"  >表示情報選択</a></li>
-        <li><a href="#"  onclick="toggleSidebar('right')"  >表示地図指定</a></li>
-        -->
-      </ul>
-    </div>
 
+      <div id="left" class="sidebar flex-center left collapsed">
+        <div class="sidebar-content rounded-rect flex-center">
 
-
-      
-
-
-
-        <div id="left" class="sidebar flex-center left collapsed">
-            <div class="sidebar-content rounded-rect flex-center">
-
-            
         
-            
-            <div
-            class="sidebar-toggle rounded-rect left"
-            onclick="toggleSidebar('left')"
-            >
-            &rarr;
-            </div>
-
-            </div>
-        </div>
-
-
-        <div id="right" class="sidebar flex-center right collapsed">
-            <div class="sidebar-content rounded-rect flex-center">
-
-
-              <div id="basemaps-selecter">
-
-                <select id="basemaps">
-                <!-- <option value="blank">地理院タイル白地図</option>  -->
-                  <option value="pale">地理院タイル skelton</option>
-               <!--  <option value="std">地理院タイル標準</option>
-                  <option value="gsi_3d">地理院タイル3D風</option>
-                  <option value="std_vertical">地理院タイル標準縦書きあり</option>
-               -->
-                  <option value="gsi_photo">地理院タイル写真</option>
-                  </select>
-              
-              </div>
-      
-       <!--   
-           <nav id="listing-group" class="listing-group">
-                  <input type="checkbox" id="sougou_kikendo" checked="checked" />
-                      <label for="sougou_kikendo">総合危険度ランク</label>
-                  <input type="checkbox" id="toukai_kikendo" />
-                      <label for="toukai_kikendo">建物倒壊危険度ランク</label>
     
-                  <input type="checkbox" id="kasai_kikendo"  />
-                      <label for="kasai_kikendo">火災危険度ランク</label>
-
-                 <input type="checkbox" id="jiban"  />
-                      <label for="jiban">地盤分類</label>
-
-          </nav>
---> 
-    <!--
-    <table>
-
-    <tr><td>
-     <div id="rank">
-      <h5>危険度ランク</h5>
-     
-     <br>
-    <img src="./data/rank.png"  width="250">
-    </div>
-    </td></tr>
-
-    <tr><td>
-
-    <div id="jiban">
-      <h5>地盤分類</h5>
-      <br>
-    <img src="./data/jibanlegend.png"  width="250">
-    </div>
-  </td></tr>
-
-  <tr><td>
-    <br><br>
-  <div id="elink">
- 詳しくは<a href=" https://www.toshiseibi.metro.tokyo.lg.jp/bosai/chousa_6/home.htm" target="_other">地震に関する地域危険度測定調査(東京都)</a>を参照してください。
- <br>参考<a href="https://www.toshiseibi.metro.tokyo.lg.jp/bosai/chousa_6/download/mikata.pdf">地域危険度一覧表の見方</a>
- </div>
-</td>
-    </table>
--->
-
-            <div
-            class="sidebar-toggle rounded-rect right"
-            onclick="toggleSidebar('right')"
-            >
-            &larr;
-            </div>
-            </div>
-        </div>
-
-        <div id="tablearea" >
-
+        
+        <div
+        class="sidebar-toggle rounded-rect left"
+        onclick="toggleSidebar('left')"
+        >
+        &rarr;
         </div>
 
 
+            <div  id="sheetlist">
+
+            </div>
+        </div>
+      </div>
 
 
+      <div id="right" class="sidebar flex-center right collapsed">
+        <div class="sidebar-content rounded-rect flex-center">
 
+
+          <div id="basemaps-selecter">
+
+            <select id="basemaps">
+       
+              <option value="pale">地理院タイル skelton</option>
+          
+              <option value="gsi_photo">地理院タイル写真</option>
+              </select>
+          
+          </div>
+ 
+
+        <div
+        class="sidebar-toggle rounded-rect right"
+        onclick="toggleSidebar('right')"
+        >
+        &larr;
+        </div>
+        </div>
     </div>
 
- <script>
+    </div>   <!--map--> 
+
+    <script>
 
 
 
 
-function toggleSidebar(id) {
-    var elem = document.getElementById(id);
-    var classes = elem.className.split(' ');
-    var collapsed = classes.indexOf('collapsed') !== -1;
-     
-    var padding = {};
-     
-    if (collapsed) {
-    // Remove the 'collapsed' class from the class list of the element, this sets it back to the expanded state.
-    classes.splice(classes.indexOf('collapsed'), 1);
-     
-    padding[id] = 300; // In px, matches the width of the sidebars set in .sidebar CSS class
-    map.easeTo({
-    padding: padding,
-    duration: 1000 // In ms, CSS transition duration property for the sidebar matches this value
-    });
-    } else {
-    padding[id] = 0;
-    // Add the 'collapsed' class to the class list of the element
-    classes.push('collapsed');
-     
-    map.easeTo({
-    padding: padding,
-    duration: 1000
-    });
-    }
-     
-    // Update the class list on the element
-    elem.className = classes.join(' ');
-    }
+      function toggleSidebar(id) {
+          var elem = document.getElementById(id);
+          var classes = elem.className.split(' ');
+          var collapsed = classes.indexOf('collapsed') !== -1;
+           
+          var padding = {};
+           
+          if (collapsed) {
+          // Remove the 'collapsed' class from the class list of the element, this sets it back to the expanded state.
+          classes.splice(classes.indexOf('collapsed'), 1);
+           
+          padding[id] = 300; // In px, matches the width of the sidebars set in .sidebar CSS class
+          map.easeTo({
+          padding: padding,
+          duration: 1000 // In ms, CSS transition duration property for the sidebar matches this value
+          });
+          } else {
+          padding[id] = 0;
+          // Add the 'collapsed' class to the class list of the element
+          classes.push('collapsed');
+           
+          map.easeTo({
+          padding: padding,
+          duration: 1000
+          });
+          }
+           
+          // Update the class list on the element
+          elem.className = classes.join(' ');
+          }
+      
+      
+      
+          //function getJson()
+          
+          var   dpurl = <?= GetDeployURL(); ?>;
+    
+      
+      
+      
+          var   GetFURL  = dpurl + "?cmd=GETFEATURES";
+      
+          var   GETSHEETS = dpurl + "?cmd=GETSHEETS";
+      
+      
+      
+          var request = new XMLHttpRequest();
+          request.open("GET", GetFURL, true);
+          request.send();
+      
+          request.responseTyoe = 'json';
+      
+      
+          var map = new maplibregl.Map({
+                  container: "map",
+                  style: 'https://raw.githubusercontent.com/gsi-cyberjapan/optimal_bvmap/main/style/skeleton.json',
+                  center: [139.581367, 35.695671],
+                  zoom: 11,
+                  maxZoom: 18,
+              });
+      
+      
+          request.onload = function() {   //onload
+             var  gj = request.response;
+      
+             var gfeature = JSON.parse(gj);
+      
+             if ( gfeature["features"].length > 1 ) {  //  地物があるか
+                var bbox = turf.bbox(gfeature);
+         
+                map.fitBounds( bbox );
+      
+      
+             }
+             else {
+      
+              if (  gfeature["features"].length == 1 ) {
+                   gf = gfeature["features"][0]["geometry"]["coordinates"];
+      
+                   lng = gf[0];
+                   lat = gf[1];
+                   map.flyTo( {centor:[lng,lat], zoom:15, speed:0.3});
+      
+              }
+              else {
+              navigator.geolocation.getCurrentPosition(pos_success,pos_fail);
+              }
+             }
+      
+      
+           
+      
+             function pos_fail(pos){
+                //  alert('位置情報の取得に失敗しました。エラーコード：');
+             }
+      
+      
+             function pos_success(pos){
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          //const accuracy = pos.coords.accuracy;
+      
+              map.flyTo( {centor:[lng,lat], zoom:10, speed:0.3});
+          //$('#loc').text(`緯度：${lat} 経度：${lng}`);
+          //$('#accuracy').text(accuracy);
+            }
+      
+      
+      
+              map.loadImage(
+                  'https://raw.githubusercontent.com/yoichigmf/lbmap/511c8c3b03f785025f33c3e77ca313e72c1e737e/sprite/marker.png',
+                      function (error, image) {
+                      if (error) throw error;
+                        map.addImage('pin', image);
+      
+                        map.addSource( 
+                           'rpoints', {
+                              'type': 'geojson',
+                              'data': gfeature
+                                }
+      
+                            );
+      
+                        map.addLayer({
+                            'id': 'points',
+                            'type': 'symbol',
+                            'source': 'rpoints',
+                            'layout': {
+                            'icon-image': 'pin',
+                            'icon-size': 0.7
+                            }
+                          });
+      
+      
+      
+                          map.on('click', 'points', function (e) {
+                              var coordinates = e.features[0].geometry.coordinates.slice();
+      
+      
+         
+      
+             
+                              var description = CreatePropertiesHTML( e.features);
+      
+       
+                              new maplibregl.Popup()
+                                           .setLngLat(coordinates)
+                                           .setHTML(description)
+                                           .addTo(map);
+      
+                               });
+        
+      
+                        }
+                  );
+      
+      
+             
+                   
+                  //  get sheets list
+                request.open("GET", GETSHEETS, true);
+                request.send();
+      
+                request.responseTyoe = 'json';
+      
+                request.onload = function() {   //onload
+                    var  slist = request.response;
+      
+                    var stlist = JSON.parse(slist);
+      
+                    var sheets = document.getElementById("sheetlist");
+      
+      
+                    sheets.innerHTML = makeSheetList(stlist);
+      
+                }
+      
+             
+      
+      
+                }    //onload  geojson
+      
+      
+                
+                function makeSheetList( sarray ){
+      
+                  var reta = "<ul>"
+      
+                    for ( const sh of sarray ){
+      
+                      reta = reta + "<li>" + sh ;
+                    }
+      
+      
+      
+      
+                  reta = reta + "</ul>";
+      
+                  return reta;
+                }
+      
+      
+      
+                map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+                map.addControl(new maplibregl.ScaleControl() );
+      
+      
+      
+              const setBasemap = (name) => {
+                  // Instantiate the given basemap layer.
+               //   map.setStyle(base_maps[name]);
+               if (name == 'gsi_photo'){
+                  console.log('gsi');
+                  map.setLayoutProperty(name, 'visibility', 'visible');
+               }
+               else {
+                map.setLayoutProperty('gsi_photo', 'visibility', 'none');
+               }
+      
+              };
+      
+      
+      
+              let navToggle = document.querySelector(".nav__toggle");
+let navWrapper = document.querySelector(".nav__wrapper");
 
-
-
-    //function getJson()
-  
-    var   dpurl = <?= GetDeployURL(); ?>;
-
-    var   GetFURL  = dpurl + "?cmd=GETFEATURES";
-
-
-
-    var   GetFURL  = dpurl + "?cmd=GETFEATURES";
-
-    var   GETSHEETS = dpurl + "?cmd=GETSHEETS";
-
-
-
-    var request = new XMLHttpRequest();
-    request.open("GET", GetFURL, true);
-    request.send();
-
-    request.responseTyoe = 'json';
-
-
-    var map = new maplibregl.Map({
-            container: "map",
-            style: 'https://raw.githubusercontent.com/gsi-cyberjapan/optimal_bvmap/main/style/skeleton.json',
-            center: [139.581367, 35.695671],
-            zoom: 11,
-            maxZoom: 18,
-        });
-
-
-    request.onload = function() {   //onload
-       var  gj = request.response;
-
-       var gfeature = JSON.parse(gj);
-
-       if ( gfeature["features"].length > 1 ) {  //  地物があるか
-          var bbox = turf.bbox(gfeature);
-   
-          map.fitBounds( bbox );
-
-
+navToggle.addEventListener("click", function () {
+  if (navWrapper.classList.contains("active")) {
+    this.setAttribute("aria-expanded", "false");
+    this.setAttribute("aria-label", "menu");
+    navWrapper.classList.remove("active");
+  } else {
+    navWrapper.classList.add("active");
+    this.setAttribute("aria-label", "close menu");
+    this.setAttribute("aria-expanded", "true");
+  }
+});
+      
+       
+      const basemapsSelectElement = document.querySelector("#basemaps");
+      
+              basemapsSelectElement.addEventListener("change", (e) => {
+                  setBasemap(e.target.value);
+       
+                 // map.triggerRepaint();
+      
+              });
+      
+      
+      
+      
+      
+      
+      
+      
+      //loadfgb();
+      
+      
+      
+      //  load flat geobuff file
+      //async function loadfgb(){
+      
+      
+             // const response = await fetch("./data/tokyorisk5.fgb")
+              map.on("load", async () => {
+      
+                        
+              map.addSource('gsi_raster', {
+        
+                    'type': 'raster',
+                    tiles: [
+                          'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+                      ],
+                    'tileSize': 256,
+                     'attribution':
+                     '国土地理院',
+        
+                 });
+      
+              map.addLayer({
+                  'id':'gsi_photo',
+                  'type':'raster',
+                  'source':'gsi_raster',
+                    'minzoom':5,
+                    'maxzoom':18,
+                    'layout':{
+                        'visibility':'none'
+                        },
+                    paint:{   "raster-opacity": 1.0}
+      
+                  });
+                });
+      
+      
+        
+      
+      function  CreatePropertyHTML( prp ){
+      
+      var rhtml = "<table><TR><TH>項目</TH><TH>値</TH></TR>";
+      
+      
+      rhtml = rhtml + "<TR><TD>ユーザ名</TD><TD>";
+      
+      rhtml = rhtml + prp["user"];
+      rhtml = rhtml + "</TD></TR>";
+      
+      rhtml = rhtml + "<TR><TD>日時</TD><TD>";
+      
+      rhtml = rhtml + prp["date"];
+      rhtml = rhtml + "</TD></TR>";
+      
+      
+      rhtml = rhtml + "<TR><TD>住所</TD><TD>";
+      
+      rhtml = rhtml + prp["text"];
+      rhtml = rhtml + "</TD></TR>";
+      
+      
+      var pobj = JSON.parse(prp["proplist"]);
+      
+      
+      rhtml = rhtml + "<TR><TD>text</TD><TD>";
+      
+      //rhtml = rhtml + " size =" + prp["proplist"].length  + " ";
+      rhtml = rhtml + pobj.length;
+      
+      
+      rhtml = rhtml + "</TD></TR>";
+      
+      if ( pobj.length > 0 ){
+      
+      
+       for ( var rec of  pobj ) {
+          rhtml = rhtml + "<TR><TD>日時</TD><TD>";
+      
+          
+          rhtml = rhtml + rec["date"];
+          rhtml = rhtml + "</TD></TR>";
+      
+          if ( rec["kind"] == "image"){
+               rhtml = rhtml + "<TR><TD>画像</TD><TD>";
+      
+               var tgurl = MakeDirectURL( rec["url"]);
+      
+      
+             rhtml = rhtml + "<img src=\""+ tgurl + "\"  width=\"200\" />";
+      
+              // rhtml = rhtml + tgurl;
+      
+               rhtml = rhtml + "</TD></TR>";
+          }
+      
+           if ( rec["kind"] == "video"){
+               rhtml = rhtml + "<TR><TD>動画</TD><TD>";
+      
+              // var tgurl = MakeDirectURL( rec["url"]);
+      
+      
+            //　rhtml = rhtml + "<img src=\""+ tgurl + "\"  width=\"200\" />";
+      
+               rhtml = rhtml + "<a href=\"" + rec["url"] + "\" target=\"movp\">動画</a>";
+      
+               rhtml = rhtml + "</TD></TR>";
+          }
+      
+          if ( rec["kind"] == "text"){
+      
+          rhtml = rhtml + "<TR><TD>text</TD><TD>";
+      
+          rhtml = rhtml + rec["text"];
+          rhtml = rhtml + "</TD></TR>";
+          }
        }
-       else {
-
-        if (  gfeature["features"].length == 1 ) {
-             gf = gfeature["features"][0]["geometry"]["coordinates"];
-
-             lng = gf[0];
-             lat = gf[1];
-             map.flyTo( {centor:[lng,lat], zoom:15, speed:0.3});
-
+      
+      
+      }
+      
+      
+      rhtml = rhtml + "</table>";
+      
+      return rhtml;
+      //var description = e.features[0].properties["user"];
+      }
+      
+      // change dropbox url 
+      function MakeDirectURL( url ){
+      
+        
+      nurl  = url.replace("www.dropbox.com", "dl.dropboxusercontent.com");
+      
+      nnurl = nurl.replace('?dl=0', '');
+      
+      return nnurl;
+      
+      }
+      
+      
+      
+      function CreatePropertiesHTML( features  ){
+        if ( features.length > 0 ) {
+      
+           var  rethtml = " ";
+      
+           for ( var  feature of features ){
+               var thtml = CreatePropertyHTML( feature.properties );
+      
+               rethtml = rethtml + thtml;
+              
+           }
+      
+           return rethtml;
+      
         }
         else {
-        navigator.geolocation.getCurrentPosition(pos_success,pos_fail);
+          return( "無し")
         }
-       }
-
-
-     
-
-       function pos_fail(pos){
-          //  alert('位置情報の取得に失敗しました。エラーコード：');
-       }
-
-
-       function pos_success(pos){
-    const lat = pos.coords.latitude;
-    const lng = pos.coords.longitude;
-    //const accuracy = pos.coords.accuracy;
-
-        map.flyTo( {centor:[lng,lat], zoom:10, speed:0.3});
-    //$('#loc').text(`緯度：${lat} 経度：${lng}`);
-    //$('#accuracy').text(accuracy);
       }
-
-
-
-        map.loadImage(
-            'https://raw.githubusercontent.com/yoichigmf/lbmap/511c8c3b03f785025f33c3e77ca313e72c1e737e/sprite/marker.png',
-                function (error, image) {
-                if (error) throw error;
-                  map.addImage('pin', image);
-
-                  map.addSource( 
-                     'rpoints', {
-                        'type': 'geojson',
-                        'data': gfeature
-                          }
-
-                      );
-
-                  map.addLayer({
-                      'id': 'points',
-                      'type': 'symbol',
-                      'source': 'rpoints',
-                      'layout': {
-                      'icon-image': 'pin',
-                      'icon-size': 0.7
-                      }
-                    });
-
-
-
-                    map.on('click', 'points', function (e) {
-                        var coordinates = e.features[0].geometry.coordinates.slice();
-
-
-   
-
-       
-                        var description = CreatePropertiesHTML( e.features);
-
- 
-                        new maplibregl.Popup()
-                                     .setLngLat(coordinates)
-                                     .setHTML(description)
-                                     .addTo(map);
-
-                         });
-  
-
-                  }
-            );
-
-
-       
-             
-            //  get sheets list
-          request.open("GET", GETSHEETS, true);
-          request.send();
-
-          request.responseTyoe = 'json';
-
-          request.onload = function() {   //onload
-              var  slist = request.response;
-
-              var sheets = JSON.parse(slist);
-
-          }
-
-       
-
-
-          }    //onload  geojson
-
-
           
+      
+      
+          </script>
 
 
 
-
-          map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
-          map.addControl(new maplibregl.ScaleControl() );
-
-
-
-        const setBasemap = (name) => {
-            // Instantiate the given basemap layer.
-         //   map.setStyle(base_maps[name]);
-         if (name == 'gsi_photo'){
-            console.log('gsi');
-            map.setLayoutProperty(name, 'visibility', 'visible');
-         }
-         else {
-          map.setLayoutProperty('gsi_photo', 'visibility', 'none');
-         }
-
-        };
-
-
-
-
-
- 
-const basemapsSelectElement = document.querySelector("#basemaps");
-
-        basemapsSelectElement.addEventListener("change", (e) => {
-            setBasemap(e.target.value);
- 
-           // map.triggerRepaint();
-
-        });
-
-
-
-
-
-
-
-
-//loadfgb();
-
-
-
-//  load flat geobuff file
-//async function loadfgb(){
-
-
-       // const response = await fetch("./data/tokyorisk5.fgb")
-        map.on("load", async () => {
-
-                  
-        map.addSource('gsi_raster', {
-  
-              'type': 'raster',
-              tiles: [
-                    'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
-                ],
-              'tileSize': 256,
-               'attribution':
-               '国土地理院',
-  
-           });
-
-        map.addLayer({
-            'id':'gsi_photo',
-            'type':'raster',
-            'source':'gsi_raster',
-              'minzoom':5,
-              'maxzoom':18,
-              'layout':{
-                  'visibility':'none'
-                  },
-              paint:{   "raster-opacity": 1.0}
-
-            });
-          });
-
-
-  
-
-function  CreatePropertyHTML( prp ){
-
-var rhtml = "<table><TR><TH>項目</TH><TH>値</TH></TR>";
-
-
-rhtml = rhtml + "<TR><TD>ユーザ名</TD><TD>";
-
-rhtml = rhtml + prp["user"];
-rhtml = rhtml + "</TD></TR>";
-
-rhtml = rhtml + "<TR><TD>日時</TD><TD>";
-
-rhtml = rhtml + prp["date"];
-rhtml = rhtml + "</TD></TR>";
-
-
-rhtml = rhtml + "<TR><TD>住所</TD><TD>";
-
-rhtml = rhtml + prp["text"];
-rhtml = rhtml + "</TD></TR>";
-
-
-var pobj = JSON.parse(prp["proplist"]);
-
-
-rhtml = rhtml + "<TR><TD>text</TD><TD>";
-
-//rhtml = rhtml + " size =" + prp["proplist"].length  + " ";
-rhtml = rhtml + pobj.length;
-
-
-rhtml = rhtml + "</TD></TR>";
-
-if ( pobj.length > 0 ){
-
-
- for ( var rec of  pobj ) {
-    rhtml = rhtml + "<TR><TD>日時</TD><TD>";
-
-    
-    rhtml = rhtml + rec["date"];
-    rhtml = rhtml + "</TD></TR>";
-
-    if ( rec["kind"] == "image"){
-         rhtml = rhtml + "<TR><TD>画像</TD><TD>";
-
-         var tgurl = MakeDirectURL( rec["url"]);
-
-
-       rhtml = rhtml + "<img src=\""+ tgurl + "\"  width=\"200\" />";
-
-        // rhtml = rhtml + tgurl;
-
-         rhtml = rhtml + "</TD></TR>";
-    }
-
-     if ( rec["kind"] == "video"){
-         rhtml = rhtml + "<TR><TD>動画</TD><TD>";
-
-        // var tgurl = MakeDirectURL( rec["url"]);
-
-
-      //　rhtml = rhtml + "<img src=\""+ tgurl + "\"  width=\"200\" />";
-
-         rhtml = rhtml + "<a href=\"" + rec["url"] + "\" target=\"movp\">動画</a>";
-
-         rhtml = rhtml + "</TD></TR>";
-    }
-
-    if ( rec["kind"] == "text"){
-
-    rhtml = rhtml + "<TR><TD>text</TD><TD>";
-
-    rhtml = rhtml + rec["text"];
-    rhtml = rhtml + "</TD></TR>";
-    }
- }
-
-
-}
-
-
-rhtml = rhtml + "</table>";
-
-return rhtml;
-//var description = e.features[0].properties["user"];
-}
-
-// change dropbox url 
-function MakeDirectURL( url ){
-
-  
-nurl  = url.replace("www.dropbox.com", "dl.dropboxusercontent.com");
-
-nnurl = nurl.replace('?dl=0', '');
-
-return nnurl;
-
-}
-
-
-
-function CreatePropertiesHTML( features  ){
-  if ( features.length > 0 ) {
-
-     var  rethtml = " ";
-
-     for ( var  feature of features ){
-         var thtml = CreatePropertyHTML( feature.properties );
-
-         rethtml = rethtml + thtml;
-        
-     }
-
-     return rethtml;
-
-  }
-  else {
-    return( "無し")
-  }
-}
-    
-
-
-    </script>
-</body>
+  </body>
 </html>
