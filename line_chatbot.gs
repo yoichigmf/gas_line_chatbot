@@ -757,6 +757,60 @@ return gjson;
 
 }
 
+function GetRasterLayers(){
+
+  
+  let tgSheet =  SpreadsheetApp.getActiveSpreadsheet().getSheetByName( '#rastermaps' );
+
+  const rows = tgSheet.getLastRow(); 
+
+  let  rjson = [];
+
+  if ( rows > 1){
+
+     for ( let ir = 2 ; ir <= rows; ++ir ){
+        let tgr = tgSheet.getRange(ir,1 ,1,10).getValues();
+
+        //console.log( tgr );
+       // console.log(tgr[0][7]);
+
+        let key = tgr[0][0];
+        let name = tgr[0][1];
+        let kind  = tgr[0][2];
+        let url   = tgr[0][3];
+        let credit = tgr[0][4];
+        let maxz = tgr[0][5];
+        let minz = tgr[0][6];
+
+        let legend = tgr[0][7];
+        let opaq  = tgr[0][8];
+        let display = tgr[0][9];
+        //console.log( name );
+
+        let  rlayer = {};
+        rlayer["key"] = key;
+        rlayer["name"] = name;
+        rlayer["kind"] = kind;
+        rlayer["url"] = url;
+
+        rlayer["credit"] = credit;
+        rlayer["maxz"] = maxz;
+        rlayer["minz"] = minz;
+
+        rlayer["legend"] = legend;
+        rlayer["opaq"] = opaq;
+        rlayer["display"] = display;
+
+        rjson.push( rlayer );
+
+    }
+
+  }
+
+
+  //console.log( rjson );
+  return rjson ;
+}
 
 function doGet(e) {
  //パラメータをログに出力してみる。
@@ -789,7 +843,7 @@ function doGet(e) {
 
 
   }　
-  else if (CMD.toUpperCase() == 'GETFEATURES'){
+  else if (CMD.toUpperCase() == 'GETFEATURS'){
     //   地物の取得
 
 　　　let  tgsheet = e.parameter['sheet'] ? e.parameter['sheet']:false;
@@ -807,6 +861,18 @@ function doGet(e) {
      return ContentService.createTextOutput(JSON.stringify( gjson, null, space  )).setMimeType(ContentService.MimeType.JSON);
 
   }
+
+   else if (CMD.toUpperCase() == 'GETRASTERLAYERS'){
+   let rlayers = GetRasterLayers();
+
+   　space = 2;
+     console.log( JSON.stringify( rlayers, null,space ));
+
+     return ContentService.createTextOutput(JSON.stringify( rlayers, null, space  )).setMimeType(ContentService.MimeType.JSON);
+
+
+  }
+
     else if (CMD.toUpperCase() == 'GFTEST'){
     //   地物の取得
 
@@ -832,6 +898,9 @@ function doGet(e) {
   else if (CMD.toUpperCase() == 'MAP'){
 
 
+
+
+    
 
    var htmlOutput = HtmlService.createTemplateFromFile("index").evaluate();
 
@@ -1030,6 +1099,20 @@ function doPost(e) {
                 }); //  sendMsg
              }
 
+             else if ( lmsg == "#help"){
+
+               let helptext = MakeHelpText();
+
+              　sendMsg(REPLY_URL, {
+                  'replyToken': event.replyToken,
+                'messages': [{
+                 'type': 'text',
+                'text': helptext,
+                 }]
+                }); //  sendMsg
+
+             }
+
 
           }
           else {
@@ -1085,3 +1168,46 @@ function doPost(e) {
 
   return ContentService.createTextOutput(JSON.stringify({ 'content': 'post ok' })).setMimeType(ContentService.MimeType.JSON);
 }
+
+function testHelp() {
+
+   let hstr = MakeHelpText();
+   Logger.log( hstr );
+
+}
+
+function MakeHelpText() {
+
+    let helpstr = "利用方法\n\n";
+    helpstr =　helpstr +  "システムの目的\n";
+
+    helpstr = helpstr +  "LINEで皆様が投稿した位置情報,テキスト,写真,動画,音声をクラウド上のシートに保存して利用するためのシステムです。位置情報がはいっていると投稿した情報を地図で確認できます\n\n";
+
+
+    helpstr = helpstr +  "LINEの上で同じ情報を投稿する皆様とグループを作成して、そのグループにこのシステムを追加していただけると、他の人の投稿を見ながら投稿情報をクラウド上のシートに集めることができます\n";
+    helpstr = helpstr +  "ただしグループに参加した方で災害情報収集用のチャットボットと友達になっていない方は必ずチャットボットと友達になっておいて下さい。\n";
+    helpstr = helpstr +  "チャットボットと友達になっていないと投稿情報に投稿者のユーザ名が残らないので地図表示を行う場合うまく表示されなくなります。\n\n";
+
+    helpstr = helpstr +  "位置情報の投稿\n";
+    helpstr = helpstr +  "位置情報を投稿してからテキスト、写真、動画、音声を投稿してください\n";
+    helpstr = helpstr +  "音声は1分間までの投稿が可能です。音声投稿は音声をテキスト化したテキストと音声データが保存されます\n";
+
+
+ //    helpstr helpstr + "位置情報投稿 line://nv/location \n";
+
+     helpstr = helpstr + "同じ場所で連続して投稿する場合は最初に1回だけ位置情報を投稿してください。場所を変えて投稿する場合は最初に1回位置情報を投稿してください。位置情報を投稿しないと地図に表示されないか地図上のあやまった位置に表示されます。\n\n";
+
+
+     helpstr = helpstr + "LINEのグループで本システムを利用する場合テキスト投稿の先頭1文字を # (半角のシャープ) で開始した投稿はスプレッドシートに保存されません。グループ内での情報共有を投稿する場合ご利用下さい\n\n";
+
+
+     helpstr = helpstr +  "\n\n特殊コマンド\n";
+
+     helpstr = helpstr +  "#map 地図表示URL表示\n";
+
+    // helpstr = helpstr +  "#list 一覧表表示URL表示\n";
+
+      helpstr = helpstr +  "#help HELPメッセージ表示\n";
+    return helpstr;
+}
+  

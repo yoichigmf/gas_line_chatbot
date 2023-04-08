@@ -1,459 +1,811 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <title>災害情報収集システム</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <!--
-    <link rel="stylesheet" href="styles/reset.min.css" />
-    -->
-    <style>
-html,body,div,span,applet,object,iframe,h1,h2,h3,h4,h5,h6,p,blockquote,pre,a,abbr,acronym,address,big,cite,code,del,dfn,em,img,ins,kbd,q,s,samp,small,strike,strong,sub,sup,tt,var,b,u,i,center,dl,dt,dd,ol,ul,li,fieldset,form,label,legend,table,caption,tbody,tfoot,thead,tr,th,td,article,aside,canvas,details,embed,figure,figcaption,footer,header,hgroup,menu,nav,output,ruby,section,summary,time,mark,audio,video{margin:0;padding:0;border:0;font-size:100%;font:inherit;vertical-align:baseline}article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}body{line-height:1}ol,ul{list-style:none}blockquote,q{quotes:none}blockquote:before,blockquote:after,q:before,q:after{content:'';content:none}table{border-collapse:collapse;border-spacing:0}
-  
-    </style>
-
-    <style>
-@import url("https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap");
-.wrapper {
-  max-width: 1140px;
-  padding-left: 1rem;
-  padding-right: 1rem;
-  margin-left: auto;
-  margin-right: auto;
-}
-
-*,
-*:before,
-*:after {
-  box-sizing: border-box;
-}
-
-a {
-  text-decoration: none;
-  color: #222;
-}
-
-html {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
-
-body {
-  font-family: "Roboto", sans-serif;
-}
-
-.sr-only {
-  position: absolute;
-  clip: rect(1px, 1px, 1px, 1px);
-  padding: 0;
-  border: 0;
-  height: 1px;
-  width: 1px;
-  overflow: hidden;
-}
-
-.button {
-  -webkit-appearance: none;
-     -moz-appearance: none;
-          appearance: none;
-  color: #fff;
-  background-color: #2fa0f6;
-  min-width: 120px;
-  padding: 0.5rem 1rem;
-  border-radius: 5px;
-  text-align: center;
-}
-
-.button svg {
-  display: inline-block;
-  vertical-align: middle;
-  width: 24px;
-  height: 24px;
-  fill: #fff;
-}
-
-.button span {
-  display: none;
-}
-
-@media (min-width: 600px) {
-  .button span {
-    display: initial;
-  }
-}
-
-.button--icon {
-  min-width: initial;
-  padding: 0.5rem;
-}
-
-
-</style>
+<html>
+<head>
+<meta charset='utf-8' />
+<title>ハザードマップ</title>
+</title>
+<meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<script src="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.js"></script>
+<link href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css" rel="stylesheet" />
+<script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
 
 <style>
-.brand {
-  font-weight: bold;
-  font-size: 20px; }
+body { margin:0; padding:0; }
+#map {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+}
 
-.site-header {
-  position: relative;
-  background-color: #def7ff; }
+#basemaps-selecter {
+        position: absolute;
+        top: 60px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0);
+        z-index:255;
+      }
 
-.site-header__wrapper {
-  padding-top: 1rem;
-  padding-bottom: 1rem; }
-  @media (min-width: 600px) {
-    .site-header__wrapper {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: 0;
-      padding-bottom: 0; } }
-@media (min-width: 600px) {
-  .nav__wrapper {
-    display: flex; } }
 
-@media (max-width: 599px) {
-  .nav__wrapper {
-    position: absolute;
-    top: 100%;
-    right: 0;
-    left: 0;
-    z-index: -1;
-    background-color: #d9f0f7;
-    visibility: hidden;
-    opacity: 0;
-    transform: translateY(-100%);
-    transition: transform 0.3s ease-out, opacity 0.3s ease-out; }
-    .nav__wrapper.active {
-      visibility: visible;
-      z-index:5;
-      opacity: 1;
-      transform: translateY(0); } }
+      #basemaps {
+        font-size: 16px;
+        padding: 4px 8px;
+      }
 
-.nav__item a {
-  display: block;
-  padding: 1.5rem 1rem; }
+#tablearea {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 200px;
+  z-index:255;
+  box-shadow: 0 0 50px -25px black;
+  background: white;
+  display:none;
+  Overflow-y:scroll;
+  Overflow-x:scroll;
 
-.nav__toggle {
-  display: none; 
-  z-index:5;
 
 }
-  @media (max-width: 599px) {
-    .nav__toggle {
-      display: block;
-      position: absolute;
-      right: 1rem;
-      top: 1rem;
-      z-index:10000;
-     } }
 
+#displayTablechk{
+        position: absolute;
+        top: 80px;
+        left: 20px;
+        background: rgba(255, 255, 255, 0);
+        z-index:255;
+        font-size: 16px;
+        padding: 4px 8px;
+      }
+
+
+#file {
+position: absolute;
+top: 80px;
+left: 20px;
+z-index:255;
+}
+
+#figsave {
+position: absolute;
+top: 120px;
+left: 20px;
+z-index:255;
+}
+#figclear {
+position: absolute;
+top: 140px;
+left: 20px;
+z-index:255;
+}
+#figbrowse {
+position: absolute;
+top: 160px;
+left: 20px;
+z-index:255;
+}
+
+#hbutton {
+  position: absolute;
+  top: 0px;
+left: 0px;
+right: 0px;
+height: 100px;
+z-index:255;
+}
+
+#inputm  {
+ position: absolute;
+   background-color: #c5e3f9;
+  top: 15px;
+left: 20px;
+
+height: 20px;
+z-index:2;
+
+    }
+
+
+.mapboxgl-popup {
+max-width: 400px;
+font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+}
 
 </style>
 
-  
-  
 
-    <link href="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.css" rel="stylesheet" />
-    <script src="https://unpkg.com/maplibre-gl@2.4.0/dist/maplibre-gl.js"></script>
-    <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+
+
+
+
+</head>
+<body >
+
 
 
   <style>
-   body { margin:0; padding:0; }
+    .legendarea {
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    font-weight: 400;
+    }
 
-#map {
-  position: absolute;
-  top: 60px;
-  bottom: 0;
-  width: 100%;
-  z-index:1;
-}
-
-
-
-  </style>
-
-  <style>
+    .listing-group {
+    font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
+    font-weight: 400;
+    position: absolute;
+    top: 80px;
+    left: 5px;
+    z-index: 1;
+    border-radius: 3px;
+    max-width: 100%;
+    color: #fff;
+    }
+     
+    .listing-group input[type='checkbox']:first-child + label {
+    border-radius: 3px 3px 0 0;
+    }
+     
+    .listing-group label:last-child {
+    border-radius: 0 0 3px 3px;
+    border: none;
+    }
+     
+    .listing-group input[type='checkbox'] {
+    display: none;
+    }
+     
+    .listing-group input[type='checkbox'] + label {
+    background-color: #3386c0;
+    display: block;
+    cursor: pointer;
+    padding: 5px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+    }
+     
+    .listing-group input[type='checkbox'] + label {
+    background-color: #3386c0;
+    text-transform: capitalize;
+    }
+     
+    .listing-group input[type='checkbox'] + label:hover,
+    .listing-group input[type='checkbox']:checked + label {
+    background-color: #4ea0da;
+    }
+     
+    .listing-group input[type='checkbox']:checked + label:before {
+    content: '✔';
+    margin-right: 5px;
+    }
 
 
     .rounded-rect {
-    background: white;
-    border-radius: 10px;
-    box-shadow: 0 0 50px -25px black;
-    }
-     
-    .flex-center {
-    position: absolute;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    }
-     
-    .flex-center.left {
-    left: 0px;
-    }
-     
-    .flex-center.right {
-    right: 0px;
-    }
-     
-    .sidebar-content {
-    position: absolute;
-    width: 95%;
-    height: 95%;
-    font-family: Arial, Helvetica, sans-serif;
-    font-size: 32px;
-    color: gray;
-    }
-     
-    .sidebar-toggle {
-    position: absolute;
-    width: 1.3em;
-    height: 1.3em;
-    overflow: visible;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    }
-     
-    .sidebar-toggle.left {
-    right: -1.5em;
-    }
-     
-    .sidebar-toggle.right {
-    left: -1.5em;
-    }
-     
-    .sidebar-toggle:hover {
-    color: #0aa1cf;
-    cursor: pointer;
-    }
-     
-    .sidebar {
-    transition: transform 1s;
-    z-index: 5;
-    width: 300px;
-    height: 100%;
-    }
-     
-    /*
-    The sidebar styling has them "expanded" by default, we use CSS transforms to push them offscreen
-    The toggleSidebar() function removes this class from the element in order to expand it.
-    */
-    .left.collapsed {
-    transform: translateX(-295px);
-    }
-     
-    .right.collapsed {
-    transform: translateX(295px);
-    }
+background: white;
+border-radius: 10px;
+box-shadow: 0 0 50px -25px black;
+}
+ 
+.flex-center {
+position: absolute;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+ 
+.flex-center.left {
+left: 0px;
+}
+ 
+.flex-center.right {
+right: 0px;
+}
+ 
+.sidebar-content {
+position: absolute;
+width: 100%;
+height: 95%;
+font-family: Arial, Helvetica, sans-serif;
+font-size: 32px;
 
+color: gray;
+}
+ 
+.sidebar-toggle {
+position: absolute;
+width: 1.3em;
+height: 1.3em;
+overflow: visible;
+display: flex;
+justify-content: center;
+align-items: center;
+}
+ 
+.sidebar-toggle.left {
+right: -1.5em;
+}
+ 
+.sidebar-toggle.right {
+left: -1.5em;
+}
+ 
+.sidebar-toggle:hover {
+color: #0aa1cf;
+cursor: pointer;
+}
+ 
+.sidebar {
+transition: transform 1s;
+z-index: 1;
+width: 300px;
+height: 100%;
+}
+ 
+/*
+The sidebar styling has them "expanded" by default, we use CSS transforms to push them offscreen
+The toggleSidebar() function removes this class from the element in order to expand it.
+*/
+.left.collapsed {
+transform: translateX(-295px);
+}
+ 
+.right.collapsed {
+transform: translateX(295px);
+}
   </style>
 
 <style>
-  .listing-group {
-  font: 12px/20px 'Helvetica Neue', Arial, Helvetica, sans-serif;
-  font-weight: 600;
-  position: absolute;
-  top:  120px;
-  left: 10px;
-  z-index: 1;
-  border-radius: 3px;
-  max-width: 100%;
-  color: #fff;
-  }
-   
-  .listing-group input[type='checkbox']:first-child + label {
-  border-radius: 3px 3px 0 0;
-  }
-   
-  .listing-group label:last-child {
-  border-radius: 0 0 3px 3px;
-  border: none;
-  }
-   
-  .listing-group input[type='checkbox'] {
-  display: none;
-  }
-   
-  .listing-group input[type='checkbox'] + label {
-  background-color: #3386c0;
-  display: block;
-  cursor: pointer;
-  padding: 10px;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.25);
-  }
-   
-  .listing-group input[type='checkbox'] + label {
-  background-color: #3386c0;
-  text-transform: capitalize;
-  }
-   
-  .listing-group input[type='checkbox'] + label:hover,
-  .listing-group input[type='checkbox']:checked + label {
-  background-color: #4ea0da;
-  }
-   
-  .listing-group input[type='checkbox']:checked + label:before {
-  content: '✔';
-  margin-right: 5px;
+  .drag-list li {
+    font-size: medium;
+    line-height:3em;
+    border:1px solid #cccccc;
+    cursor:pointer;
   }
 
+
+  .arrow-top{
+    border: 0;
+    border-top: solid 2px #051181;
+    border-right: solid 2px #051181;
+    display: inline-block;
+    transform: rotate(-45deg);
+    width: 10px;
+    height: 10px;
+}
+
+.arrow-right{
+    border: 0;
+    border-top: solid 2px #fb3c3c;
+    border-right: solid 2px #fb3c3c;
+    display: inline-block;
+    transform: rotate(45deg);
+    width: 10px;
+    height: 10px;
+}
+
+.arrow-bottom{
+    border: 0;
+    border-bottom: solid 2px #feb64a;
+    border-right: solid 2px #feb64a;
+    display: inline-block;
+    transform: rotate(45deg);
+    width: 10px;
+    height: 10px;
+}
+
+.arrow-left{
+    border: 0;
+    border-top: solid 2px #128b8e;
+    border-left: solid 2px #128b8e;
+    display: inline-block;
+    transform: rotate(-45deg);
+    width: 10px;
+    height: 10px;
+}
+
+
+/*  ---------------------
+   以下は調整用
+ --------------------- */
+a{
+  margin: 0 5px;
+}
   </style>
 
 
-  </head>
-  <body>
-    <!-- Header Start -->
-    <header class="site-header">
-      <div class="wrapper site-header__wrapper">
-        <a href="#" class="brand">災害情報収集システム</a>
-        <nav class="nav">
-          <button class="nav__toggle" aria-expanded="false" type="button">
-            menu
-          </button>
-          <ul class="nav__wrapper">
-            <li class="nav__item"><a href="#">表示位置指定</a></li>
-            <li class="nav__item"><a href="#">データシート指定</a></li>
-            <li class="nav__item"><a href="#">表示情報指定</a></li>
-            <li class="nav__item"><a href="#"   onclick="toggleSidebar('right')"   >表示地図指定</a></li>
-            <!--
-            <li class="nav__item"><a href="#">Contact</a></li>
-            -->
-          </ul>
-        </nav>
-      </div>
-    </header>
-    <!-- Header End -->
 
 
 
+ 
+<div id='map'  >
 
 
-    <div id="map">
+
+  <!--  map click mode select  -->
+<!--
+  <div id="inputm">
+
+  <form name="inputmf">
+	<input type="checkbox" onChange="ChangeMode()"  name="inputmode" />情報入力
+ </form>
+  </div>
+
+-->
+
+  <div id="left" class="sidebar flex-center left collapsed">
+    <div class="sidebar-content rounded-rect flex-center">
+
+      <div id="legend" class="legendarea">
 
 
-      <div id="left" class="sidebar flex-center left collapsed">
-        <div class="sidebar-content rounded-rect flex-center">
-
-        
-    
-        
-        <div
-        class="sidebar-toggle rounded-rect left"
-        onclick="toggleSidebar('left')"
-        >
-        &rarr;
-        </div>
-
-
-            <div  id="sheetlist">
-
-            </div>
-        </div>
       </div>
 
+  <!--
+   <ul>
+    <li><input type="text" id="srcn" name="srcn" >src</li>
+    <li><input type="text"  id="tgt" name="tgt" >tgt</li>
+    <li><input type="button" onClick="movelayer()" name="move"></li>
+  </ul>
+   -->
 
-      <div id="right" class="sidebar flex-center right collapsed">
-        <div class="sidebar-content rounded-rect flex-center">
+    <!-- button -->
+      <div class="sidebar-toggle rounded-rect left"
+                onclick="toggleSidebar('left')"   id="la"  >
+               &rarr;
+        </div>
+    </div>
+  </div>
+
+  
 
 
-          <div id="basemaps-selecter">
+    <div id="right"   class="sidebar flex-center right collapsed">
+
+    <div id="basemaps-selecter">
 
             <select id="basemaps">
-       
-              <option value="pale">地理院タイル skelton</option>
+         
+              <option value="pale">地理院タイル標準地図</option>
           
               <option value="gsi_photo">地理院タイル写真</option>
               </select>
           
-          </div>
+     </div>
+
+
+    <div  class="sidebar-content rounded-rect flex-center">
+
+   
+    <!--   layer list -->
+        <ui id="listing-group"  class="listing-group">
+
+     
+         </ui>
+
  
+  
 
-        <div
-        class="sidebar-toggle rounded-rect right"
-        onclick="toggleSidebar('right')"
-        >
-        &larr;
-        </div>
-        </div>
+
+
+   <!-- button -->
+     <div  class="sidebar-toggle rounded-rect right"
+                  onclick="toggleSidebar('right')"
+                 id="ra"   >
+                &larr;
+       </div>
     </div>
-
-    </div>   <!--map--> 
-
-    <script>
+    </div>
+</div>
 
 
 
 
-      function toggleSidebar(id) {
-          var elem = document.getElementById(id);
-          var classes = elem.className.split(' ');
-          var collapsed = classes.indexOf('collapsed') !== -1;
-           
-          var padding = {};
-           
-          if (collapsed) {
-          // Remove the 'collapsed' class from the class list of the element, this sets it back to the expanded state.
-          classes.splice(classes.indexOf('collapsed'), 1);
-           
-          padding[id] = 300; // In px, matches the width of the sidebars set in .sidebar CSS class
-          map.easeTo({
-          padding: padding,
-          duration: 1000 // In ms, CSS transition duration property for the sidebar matches this value
-          });
-          } else {
-          padding[id] = 0;
-          // Add the 'collapsed' class to the class list of the element
-          classes.push('collapsed');
-           
-          map.easeTo({
-          padding: padding,
-          duration: 1000
-          });
-          }
-           
-          // Update the class list on the element
-          elem.className = classes.join(' ');
-          }
+
+
+
+</div>  <!--  end of map -->
+
+
+
+<script>
+
+  //   GAS で動いているかどうかを示すモード  1 GAS   0  not GAS
+  var  GasMode = 1;
+
+  function movelayer(){
+
+    let se = document.getElementById('srcn');
+    let tg = document.getElementById('tgt');
+    let lay1 = se.value;
+    let lay2  = tg.value;
+
+    let lmsg = "map.moveLayer( " + lay1 + "," + lay2 + ");"
+    console.log( lmsg );
+
+    map.moveLayer( lay1, lay2 );
+    // alert(se.value);
+  }
+  var  bottom_layer_id = "";
+
+  //   ドラッグ用のイベント登録
+  function SetDragScript(){
+    document.querySelectorAll('.drag-list li').forEach (elm => {
+    elm.ondragstart = function () {
+      event.dataTransfer.setData('text/plain', event.target.id);
+    };
+    elm.ondragover = function () {
+      event.preventDefault();
+      let rect = this.getBoundingClientRect();
+      if ((event.clientY - rect.top) < (this.clientHeight / 2)) {
+        //マウスカーソルの位置が要素の半分より上
+        this.style.borderTop = '2px solid blue';
+        this.style.borderBottom = '';
+      } else {
+        //マウスカーソルの位置が要素の半分より下
+        this.style.borderTop = '';
+        this.style.borderBottom = '2px solid blue';
+      }
+    };
+    elm.ondragleave = function () {
+      this.style.borderTop = '';
+      this.style.borderBottom = '';
+    };
+    elm.ondrop = function () {
+      event.preventDefault();
+      let id = event.dataTransfer.getData('text/plain');
+      let elm_drag = document.getElementById(id);
+
+      let layerid = "";
+
+      if ( this.draggable){
+        layerid = this.children[0].id;
+      }
+
       
-      
-      
-          //function getJson()
-          
-          var   dpurl = <?= GetDeployURL(); ?>;
+
+      let layerid2 = elm_drag.children[0].id;
+
+      //console.log( layerid);
+      //console.log( layerid2);
+  
+      let rect = this.getBoundingClientRect();
+      if ((event.clientY - rect.top) < (this.clientHeight / 2)) {
+        //マウスカーソルの位置が要素の半分より上
+
+        if ( this.draggable ){
+          map.moveLayer( layerid2, layerid);
+           // map.moveLayer( layerid2, layerid);
+        }
+        else {
+          map.moveLayer( layerid2 );
+        }
+
+        this.parentNode.insertBefore(elm_drag, this);
+
+         
+        //map.moveLayer( layerid, layerid2);
+        console.log( layerid2);
+
+        console.log( layerid);
+      } else {
+        //マウスカーソルの位置が要素の半分より下
+        let id1  = elm_drag.children[0].id;
+
+        let id2 =  "id__2";
+
+        if ( this.nextSibling.draggable ){
+          id2= this.nextSibling.children[0].id;
+
+           map.moveLayer( id1, id2);
+        }
+        else {
+
+          map.moveLayer( id1 ,bottom_layer_id );
+        }
+       
+
+        this.parentNode.insertBefore(elm_drag, this.nextSibling);
+
+        console.log(id1);
+        console.log(id2);     
+      }
+      this.style.borderTop = '';
+      this.style.borderBottom = '';
+    };
+  });
+  }
+</script>
+
+
+
+
+<script>
+
+var myWindow;
+function openPopup( pvalue ) {
+    myWindow = window.open("", "myWindow", "width=200,height=100,menubar=0,status=0,location=0,toolbar=0,top=100");
+    myWindow.document.write("<p>ポップアップ表示だよ</p>");
+}
+
+
+
+
+//  地図クリック時の入力モード切り替え
+function ChangeMode(){
+
+  const chk = document.inputmf.inputmode;
+
+  if ( chk.checked ){
+     //alert("true");
+
+    map.on('click', add_content);
+
+  }
+  else{
+   //alert( "false" );
+  
+    map.off('click', add_content); 
+
+  }
+
+
+}
+
+//   slide area  toggle  
+function toggleSidebar(id) {
+  var elem = document.getElementById(id);
+  var classes = elem.className.split(' ');
+  var collapsed = classes.indexOf('collapsed') !== -1;
+
+  var left =  classes.indexOf('left') !== -1;
+ 
+  var padding = {};
+ 
+  if (collapsed) {
+// Remove the 'collapsed' class from the class list of the element, this sets it back to the expanded state.
+    classes.splice(classes.indexOf('collapsed'), 1);
+ 
+    padding[id] = 300; // In px, matches the width of the sidebars set in .sidebar CSS class
+
+    //   矢印反転
+    if ( left ){
+      //alert('left');
+      var lftbtn = document.getElementById("la");
+      lftbtn.innerHTML =  "&larr;";
+
+      updateLegendHtml();  //  凡例HTMLの更新
+   
+    }
+    else {
+      //alert('right');
+      var rigbtn = document.getElementById("ra");
+      rigbtn.innerHTML =  "&rarr;";
+    }
+    map.easeTo({
+        padding: padding,
+        duration: 1000 // In ms, CSS transition duration property for the sidebar matches this value
+        });
+    } else {
+        padding[id] = 0;
+// Add the 'collapsed' class to the class list of the element
+        classes.push('collapsed');
+
+
+    //  矢印反転
+    if ( left ){
+
+      var lftbtn = document.getElementById("la");
+      lftbtn.innerHTML =  "&rarr;";
+    }
+    else {
+      //alert('right');
+      var rigbtn = document.getElementById("ra");
+      rigbtn.innerHTML =  "&larr;";
+    }
+ 
+    map.easeTo({
+        padding: padding,
+        duration: 1000
+      });
+  }
+ 
+// Update the class list on the element
+  elem.className = classes.join(' ');
+}
+
+tstyle =  'https://raw.githubusercontent.com/gsi-cyberjapan/optimal_bvmap/main/style/skeleton.json'
+
+stdstyle =  'https://raw.githubusercontent.com/gsi-cyberjapan/gsivectortile-mapbox-gl-js/master/std.json'
+
+var map = new maplibregl.Map({
+  container: 'map',
+  hash: true,
+  style: stdstyle , //style.jsonへのパス
+  center: [139.773957, 35.674790],  
+  zoom: 15,
+  maxZoom: 17.99,
+  minZoom: 4,
+  localIdeographFontFamily: false
+//  localIdeographFontFamily: ['MS Gothic', 'Hiragino Kaku Gothic Pro', 'sans-serif']
+});
+
+
+map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+map.addControl(new maplibregl.ScaleControl() );
+
+
+map.on('load', function () {
+
+
+  
+map.addSource('gsi_raster', {
+  
+  'type': 'raster',
+   tiles: [
+               'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+           ],
+  'tileSize': 256,
+  'attribution':
+  '国土地理院',
+
+       });
+
+map.addLayer({
+   'id':'gsi_photo',
+      'type':'raster',
+      'source':'gsi_raster',
+      'minzoom':5,
+      'maxzoom':18,
+      'layout':{
+              'visibility':'none'
+              },
+       paint:{  'raster-opacity': 1.0}
+
+      });
+
+  bottom_layer_id  = 'gsi_photo';
+
+  var  dpurl;
+  if ( GasMode == 1 ){
+         dpurl = <?= GetDeployURL(); ?>;
+    }
+  else {
+ 
     
-      
-      
-      
-          var   GetFURL  = dpurl + "?cmd=GETFEATURES";
-      
-          var   GETSHEETS = dpurl + "?cmd=GETSHEETS";
-      
-      
-      
-          var request = new XMLHttpRequest();
-          request.open("GET", GetFURL, true);
-          request.send();
-      
-          request.responseTyoe = 'json';
-      
-      
-          var map = new maplibregl.Map({
-                  container: "map",
-                  style: 'https://raw.githubusercontent.com/gsi-cyberjapan/optimal_bvmap/main/style/skeleton.json',
-                  center: [139.581367, 35.695671],
-                  zoom: 11,
-                  maxZoom: 18,
+  }
+
+ var   GetFURL  = dpurl + "?cmd=GETFEATURS";
+
+ var   GetRaster = dpurl + "?cmd=GETRASTERLAYERS"
+
+ RasterLayers = [];
+
+
+ //  SpreadSheetに定義したラスタレイヤリストを設定する
+ fetch(GetRaster, {
+    method: "GET",
+    mode: "cors"
+  })
+  .then(response => {
+    if (response.ok) {
+      return response.json();
+    }
+    // 404 や 500 ステータスならここに到達する
+    throw new Error('Network response was not ok.');
+  })
+  .then(resJson => {
+
+    RasterLayers = resJson;
+
+    var nc = 1;
+    for ( const rstl of  RasterLayers ){
+         // console.log( rstl["name"]);
+         
+         atr = rstl["credit"];
+         scname = "src" + nc;
+
+         rstl["source_id"] = scname;
+
+         map.addSource(scname, {
+  
+          'type': 'raster',
+          'tiles': [
+                       rstl["url"]
+           ],
+               'tileSize': 256,
+                'attribution':
+                       atr
+  
+               });
+
+            
+          lyname = "ly" + nc;
+          console.log( lyname + " " + rstl["name"]);
+
+         rstl["layer_id"] = lyname;
+
+         opc = rstl["opaq"];
+
+         zmin = rstl["minz"];
+         zmax = rstl["maxz"];
+
+         vis = rstl["display"];
+
+         vtext = 'none';
+         if ( vis == 1){
+              vtext = 'visible';
+         }
+         map.addLayer({
+             'id':lyname,
+             'type':'raster',
+             'source':scname,
+             'minzoom':zmin,
+             'maxzoom':zmax,
+             'layout':{ 'visibility':vtext },
+              paint:{   "raster-opacity": opc}
+
               });
+             // map.setLayoutProperty('point_sample', 'visibility', 'none');
+           ++nc;
+         }
+
+
+         //  ラスタレイヤリストを反転させてチェックボックスリストにする　
+         var rvlay = RasterLayers.reverse();
+
+         
+
+         var ihtml = "<ul class=\"drag-list\"> ";
+
+         var idv = 0;
+         for ( const rstl of  rvlay  ){
+
+
+            chkstr = " ";
+            if ( rstl["display"] == 1){
+              chkstr = " checked=\"checked\" ";
+
+            }
+
+            idc = "idn" + idv;
+
+            var rlayerid = rstl["layer_id"] ;
+
+            
+             ihtml = ihtml  + "<li draggable=\"false\"   id=\"" +  idc + "\"  name=\"" + rlayerid + 
+                "\"></a><input type=\"checkbox\" onChange=\"changeCheck( this )\"      id=\"" + rlayerid + "\""  + chkstr + " /> <label     for=\"" + rlayerid  + "\" >" + rstl["name"] + "</label></li>"; 
+
+              
+
+           // ihtml = ihtml  + "<li draggable=\"false\" oncontextmenu=\"openPopup( this )\"  id=\"" +  idc + "\"  name=\"" + rlayerid + 
+            //  "\"></a><input type=\"checkbox\" onChange=\"changeCheck( this )\"      id=\"" + rlayerid + "\""  + chkstr + " /> <label     for=\"" + rlayerid  + "\" >" + rstl["name"] + "</label></li>"; 
+
+              
+
+             // changeCheck( check, id  ){
+            ++idv;
+         }
+
+         ihtml = ihtml + "<li draggable=\"false\"  style=\"border:0;list-style-type:none;\">&nbsp;</li></ul>"
+
+         var  lgp = document.getElementById("listing-group");
+
+         //var  lgp = document.getElementById("llist");
+         lgp.innerHTML =  ihtml ;
+         console.log(ihtml);
+         SetDragScript();   //  動的に作成した要素に対するイベントは作成後に追加　　ドラッグイベントを追加
+
+
+         var gfeature ;
+
+    //console.log(JSON.stringify(RasterLayers));
+        var request = new XMLHttpRequest();
+        request.open("GET", GetFURL, true);
+        request.send();
       
-      
-          request.onload = function() {   //onload
+        request.responseTyoe = 'json';
+
+        request.onload = function() {   //onload
              var  gj = request.response;
       
-             var gfeature = JSON.parse(gj);
+             gfeature = JSON.parse(gj);
       
              if ( gfeature["features"].length > 1 ) {  //  地物があるか
                 var bbox = turf.bbox(gfeature);
@@ -478,14 +830,117 @@ body {
              }
       
       
-           
+       //    Spread Sheet中の調査ポイントを追加 
+
+       map.addSource( 
+                           'rpoints', {
+                              'type': 'geojson',
+                              'data': gfeature
+                                }
       
-             function pos_fail(pos){
+                            );
+
+
+
+//    調査ポイントのアイコン
+map.loadImage(
+  'https://raw.githubusercontent.com/yoichigmf/lbmap/511c8c3b03f785025f33c3e77ca313e72c1e737e/sprite/marker.png',
+   function (error, image) {
+       if (error) throw error;
+       map.addImage('pin', image);
+
+
+
+       map.addLayer({
+            'id': 'points',
+            'type': 'symbol',
+            'source': 'rpoints',
+            'layout': {
+            'icon-image': 'pin',
+            'icon-size': 0.7
+                   }
+      });
+
+
+    }
+);
+
+
+
+       
+     
+
+
+          }
+
+
+//    Spread Sheet中の調査ポイントを追加
+/*
+map.addSource( 
+        'rpoints', {
+        'type': 'geojson',
+         'data':GetFURL  
+        }
+
+);
+*/
+
+
+
+
+
+
+  })
+  .catch(error => {
+    // ネットワークエラーの場合はここに到達する
+    console.error(error);
+  })
+
+  //  右ボタンメニュー制御
+  //document.oncontextmenu = function () {return false;}
+
+
+
+
+//   調査ポイントクリックイベント
+
+  map.on('click', 'points', function (e) {
+        var coordinates = e.features[0].geometry.coordinates.slice();
+//var description = e.features[0].properties.description;
+
+   
+
+       //  ポップアップ用のHTML作成
+       var description = CreatePropertiesHTML( e.features);
+
+
+       console.log('A click event occurred.');
+
+ 
+ //   ポップアップ
+new maplibregl.Popup()
+.setLngLat(coordinates)
+.setHTML(description)
+.addTo(map);
+
+  });
+
+
+
+
+
+
+
+});
+
+
+ 
+function pos_fail(pos){
                 //  alert('位置情報の取得に失敗しました。エラーコード：');
              }
       
       
-             function pos_success(pos){
+function pos_success(pos){
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
           //const accuracy = pos.coords.accuracy;
@@ -494,195 +949,128 @@ body {
           //$('#loc').text(`緯度：${lat} 経度：${lng}`);
           //$('#accuracy').text(accuracy);
             }
-      
-      
-      
-              map.loadImage(
-                  'https://raw.githubusercontent.com/yoichigmf/lbmap/511c8c3b03f785025f33c3e77ca313e72c1e737e/sprite/marker.png',
-                      function (error, image) {
-                      if (error) throw error;
-                        map.addImage('pin', image);
-      
-                        map.addSource( 
-                           'rpoints', {
-                              'type': 'geojson',
-                              'data': gfeature
-                                }
-      
-                            );
-      
-                        map.addLayer({
-                            'id': 'points',
-                            'type': 'symbol',
-                            'source': 'rpoints',
-                            'layout': {
-                            'icon-image': 'pin',
-                            'icon-size': 0.7
-                            }
-                          });
-      
-      
-      
-                          map.on('click', 'points', function (e) {
-                              var coordinates = e.features[0].geometry.coordinates.slice();
-      
-      
-         
-      
-             
-                              var description = CreatePropertiesHTML( e.features);
-      
-       
-                              new maplibregl.Popup()
-                                           .setLngLat(coordinates)
-                                           .setHTML(description)
-                                           .addTo(map);
-      
-                               });
-        
-      
-                        }
-                  );
-      
-      
-             
-                   
-                  //  get sheets list
-                request.open("GET", GETSHEETS, true);
-                request.send();
-      
-                request.responseTyoe = 'json';
-      
-                request.onload = function() {   //onload
-                    var  slist = request.response;
-      
-                    var stlist = JSON.parse(slist);
-      
-                    var sheets = document.getElementById("sheetlist");
-      
-      
-                    sheets.innerHTML = makeSheetList(stlist);
-      
-                }
-      
-             
-      
-      
-                }    //onload  geojson
-      
-      
-                
-                function makeSheetList( sarray ){
-      
-                  var reta = "<ul>"
-      
-                    for ( const sh of sarray ){
-      
-                      reta = reta + "<li>" + sh ;
-                    }
-      
-      
-      
-      
-                  reta = reta + "</ul>";
-      
-                  return reta;
-                }
-      
-      
-      
-                map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
-                map.addControl(new maplibregl.ScaleControl() );
-      
-      
-      
-              const setBasemap = (name) => {
-                  // Instantiate the given basemap layer.
-               //   map.setStyle(base_maps[name]);
-               if (name == 'gsi_photo'){
-                  console.log('gsi');
-                  map.setLayoutProperty(name, 'visibility', 'visible');
-               }
-               else {
-                map.setLayoutProperty('gsi_photo', 'visibility', 'none');
-               }
-      
-              };
-      
-      
-      
-              let navToggle = document.querySelector(".nav__toggle");
-let navWrapper = document.querySelector(".nav__wrapper");
 
-navToggle.addEventListener("click", function () {
-  if (navWrapper.classList.contains("active")) {
-    this.setAttribute("aria-expanded", "false");
-    this.setAttribute("aria-label", "menu");
-    navWrapper.classList.remove("active");
-  } else {
-    navWrapper.classList.add("active");
-    this.setAttribute("aria-label", "close menu");
-    this.setAttribute("aria-expanded", "true");
+
+
+
+
+
+function updateLegendHtml(){//  凡例HTMLの更新
+      var legendarea = document.getElementById("legend");
+
+      let leghtml = GetLegendHTML();
+
+      legendarea.innerHTML = leghtml;
+    }  
+
+
+// 
+function GetLegendHTML(){
+
+   var tghtml = "<table>";
+
+    let leg_list = GetLegendList();
+
+    var  addlist = [];
+
+
+    for ( const leg of  leg_list ){
+
+      leg_url = leg["legend"];
+      leg_name = leg["name"];
+
+
+      let dupli = checkeaddList( leg_url, addlist );
+
+      if ( ! dupli ){
+      
+           tghtml = tghtml + "<TR><TD>";
+
+           wstr = "width=\"200\" ";
+
+
+          
+
+          tghtml = tghtml + leg_name + "<br><img src=\"" + leg_url + "\" " + wstr + "/>";
+
+           tghtml = tghtml + "</TD></TR>";
+
+           addlist.push( leg_url );
+      }
+
+
+    }
+
+
+    tghtml = tghtml + "</table>";
+
+    return tghtml;
+}
+
+//   同一の凡例が追加されているかどうかのチェック
+function checkeaddList( legend , leglist){
+
+  var ret = false;
+
+  for ( const leg of leglist ){
+
+     if ( legend == leg ){
+        ret = true;
+     }
   }
-});
-      
-       
-      const basemapsSelectElement = document.querySelector("#basemaps");
-      
-              basemapsSelectElement.addEventListener("change", (e) => {
-                  setBasemap(e.target.value);
-       
-                 // map.triggerRepaint();
-      
-              });
-      
-      
-      
-      
-      
-      
-      
-      
-      //loadfgb();
-      
-      
-      
-      //  load flat geobuff file
-      //async function loadfgb(){
-      
-      
-             // const response = await fetch("./data/tokyorisk5.fgb")
-              map.on("load", async () => {
-      
-                        
-              map.addSource('gsi_raster', {
-        
-                    'type': 'raster',
-                    tiles: [
-                          'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
-                      ],
-                    'tileSize': 256,
-                     'attribution':
-                     '国土地理院',
-        
-                 });
-      
-              map.addLayer({
-                  'id':'gsi_photo',
-                  'type':'raster',
-                  'source':'gsi_raster',
-                    'minzoom':5,
-                    'maxzoom':18,
-                    'layout':{
-                        'visibility':'none'
-                        },
-                    paint:{   "raster-opacity": 1.0}
-      
-                  });
-                });
-      
-      
-        
+
+
+  return ret;
+
+
+}
+
+
+//　凡例URLのリストを返す
+function GetLegendList() {
+
+  var legend_array = [];
+
+  for ( const rstl of  RasterLayers ){
+     if ( rstl["display"] ==1 ){
+      var  leg = {};
+      leg["legend"] = rstl["legend"];
+      leg["name"] = rstl["name"];
+
+      legend_array.push( leg );
+     }
+  }
+
+   return legend_array;
+}
+
+function layerup( lid ){
+
+     alert( lid  + " up");
+
+}
+
+function layerdown( lid ){
+  alert( lid  + " down");
+}
+
+function lblClick( ivl ){
+
+  var  chk = ivl.children[0];
+
+  alert(chk.id);
+
+  return false;
+}
+
+function nothing( iv ){
+
+alert("nothing click");
+
+return false;
+}
+
+ 
       
       function  CreatePropertyHTML( prp ){
       
@@ -805,12 +1193,176 @@ navToggle.addEventListener("click", function () {
           return( "無し")
         }
       }
-          
-      
-      
-          </script>
+
+
+ 
+const basemapsSelectElement = document.querySelector("#basemaps");
+
+        basemapsSelectElement.addEventListener("change", (e) => {
+            setBasemap(e.target.value);
+ 
+           // map.triggerRepaint();
+
+        });
+
+
+   
+
+ const setBasemap = (name) => {
+
+         if (name == 'gsi_photo'){
+            console.log('gsi');
+            map.setLayoutProperty(name, 'visibility', 'visible');
+         }
+         else {
+          map.setLayoutProperty('gsi_photo', 'visibility', 'none');
+         }
+
+        };
 
 
 
-  </body>
-</html>
+
+
+
+
+
+
+
+var nmarker = new maplibregl.Marker();
+
+var popupv;
+
+//   情報登録
+function add_content (event) {
+  var coordinates = event.lngLat;
+  console.log('Lng:', coordinates.lng, 'Lat:', coordinates.lat);
+
+  formhtml = "<b>危険情報登録</b><br/><form  METHOD=\"GET\”  action=\"\"   enctype=\"multipart/form-data\" >";
+  formhtml = formhtml + "<input type=\"text\" name=\"stext\"  METHOD=\"GET\" />";
+
+    
+  formhtml = formhtml + "<input type=\"file\" name=\"imgf\" ><br>";
+    
+  formhtml = formhtml + "<input type=\"submit\" value=\"登録\" onclick=\"commit(this.form)\">"
+  formhtml = formhtml + "<input type=\"hidden\" name=\"lng\" value=\""  + coordinates.lng + "\"><input type=\"hidden\" name=\"lat\" value=\"" + coordinates.lat + "\"></form>";
+
+  popupv = new maplibregl.Popup({
+        closeOnClick: true
+      })
+      .setLngLat(coordinates )
+      .setHTML(formhtml)
+
+  popupv.addTo(map);
+
+
+ // nmarker.setLngLat(coordinates).addTo(map);
+}
+
+function commit(form){
+  popupv.remove();
+  console.log("commit");
+  console.log( form.stext.value );
+  console.log(form.lat.value );
+
+  var cd = {"lng":form.lng.value,  "lat":form.lat.value};
+
+  //   レイヤにポイント追加するように改造必要  20221227
+  nmarker.setLngLat(cd).addTo(map);
+
+
+   //google.script.run.withSuccessHandler(sample).AccountCheck();
+/*
+   google.script.run
+      .withSuccessHandler( successf )
+      .withFailureHandler( failf )
+      .addMessage(form.stext.value, form.lat.value, form.lng.value ); 
+
+*/
+
+//  GASの場合　GASで定義した addMessage という関数を実行している
+if ( GasMode == 1){
+ google.script.run
+      .withSuccessHandler( successf )
+      .withFailureHandler( failf )
+      .addMessage(form.stext.value, form.lat.value, form.lng.value); 
+  //function  addMessage( text, lat, lon ){
+
+  }
+  //  GASでない場合は　Postで登録できるようにしておく
+
+
+  return true;
+}
+
+function successf(){
+  console.log("success");
+
+}
+function failf(){
+   console.log("fail");
+
+}
+
+
+//     レイヤ表示のチェック変更
+function  changeCheck( check  ){
+
+var layername = check.id;
+if (check.checked) {
+  map.setLayoutProperty(layername, 'visibility', 'visible');
+
+} else {
+  map.setLayoutProperty(layername, 'visibility', 'none');
+
+}
+
+//   配列内データ更新
+ChangeCheckInArray( check );
+
+//   HTMLを更新する
+updateLegendHtml();
+
+
+
+}
+
+//  レイヤアレイ中のチェック変更
+function  ChangeCheckInArray( check ){
+  for ( const rstl of  RasterLayers ){
+       if ( rstl["layer_id"]== check.id){
+        if (check.checked) {
+           rstl["display"] = 1;
+        }
+        else {
+          rstl["display"] = 0;
+        }
+
+       }
+
+  }
+
+
+}
+
+
+/*
+document
+.getElementById('listing-group')
+.addEventListener('change', function (e) {
+var layername = e.target.id;
+if (e.target.checked) {
+  map.setLayoutProperty(layername, 'visibility', 'visible');
+
+} else {
+  map.setLayoutProperty(layername, 'visibility', 'none');
+
+}
+});
+*/
+
+
+</script>
+
+ 
+</body>
