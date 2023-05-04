@@ -112,7 +112,7 @@ function GetFeaturesGeoJSON( sheetname ){
 
 
                  var feature = { 
-                   　　　　　　　　id: arkey,
+                                   id: arkey,
                                 type:'Feature',
                                 geometry:geom ,
                                 properties: prop };
@@ -129,9 +129,9 @@ function GetFeaturesGeoJSON( sheetname ){
 
                     var ukey = "";
 
-　　　　　　　　　　　　if ( array_key_exists( userd, uid_ar )) {
+                        if ( array_key_exists( userd, uid_ar )) {
 
-                  　　　　let ukeyd  = uid_ar[userd];
+                          let ukeyd  = uid_ar[userd];
                          ukey = userd  + "_" + ukeyd;
                   
                         }

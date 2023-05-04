@@ -5,7 +5,7 @@
 //  Bセルに値
 //  Line Messaging APIトークン   1行目
 //  DROPBOXACCESSTOKEN          2行目
-//  SPEECHAPIKEY　　　　　　　　　 3行名
+//  SPEECHAPIKEY                   3行名
 
 
 const ACCESS_TOKEN = getPropetySheet().getRange(1, 2).getValue();
@@ -25,8 +25,8 @@ const REPLY_URL = 'https://api.line.me/v2/bot/message/reply';
 function onOpen() {
 
     const customMenu = SpreadsheetApp.getUi()
-  　customMenu.createMenu('地図機能')　//メニューバーに表示するカスタムメニュー名
-      .addItem('地図を開く', 'openMapUrl')　//メニューアイテムを追加
+    customMenu.createMenu('地図機能')  //メニューバーに表示するカスタムメニュー名
+      .addItem('地図を開く', 'openMapUrl')  //メニューアイテムを追加
       .addToUi()
 
     //var murl = mapDisplayURL();
@@ -84,7 +84,7 @@ function getUuid() {
 //   書き込み対象シートを取得
 function  getTargetSheet(){
 
-　　　let fsheet = getFirstSheet();
+      let fsheet = getFirstSheet();
 
      return fsheet;
 
@@ -286,7 +286,7 @@ function createSharedLink( filepath ){
   var headers = {
    'Content-Type': 'application/json',
     'Authorization': 'Bearer ' + dropboxAccessToken,
-   //　'Dropbox-API-Arg': JSON.stringify(parameters),
+   //  'Dropbox-API-Arg': JSON.stringify(parameters),
   };
   var options = {
     'method': 'POST',
@@ -405,7 +405,7 @@ function sendMsg(url, payload) {
   });
 }
 
-//  指定ユーザのプロファイル取得　　( フォローある場合)
+//  指定ユーザのプロファイル取得    ( フォローある場合)
 function  getUserProfile( id ){
  const url = 'https://api.line.me/v2/bot/profile/' + id ;
 
@@ -473,7 +473,7 @@ function recordUser(userId, timestamp, id) {
 }
 
 function recordText(userId, timestamp, tgText) {
-  //　　書き込み対象シートを読み込み、最終行を取得
+  //    書き込み対象シートを読み込み、最終行を取得
   const mySheet = getTargetSheet();
   const lastRow = mySheet.getLastRow();
   // テキスト書き込み
@@ -498,7 +498,7 @@ function TestPostSlack(){
 }
 
 function PostSlackText( userid, timestamp , tgtext ){
-  if ( SLACK_URL　=== ""){
+  if ( SLACK_URL  === ""){
      Logger.log("slack url is blank");
   }
   else {
@@ -531,7 +531,7 @@ function PostSlackText( userid, timestamp , tgtext ){
 
 
 function PostSlackLocation( userid, timestamp , lat, lon, address  ){
-  if ( SLACK_URL　=== ""){
+  if ( SLACK_URL  === ""){
      Logger.log("slack url is blank");
   }
   else {
@@ -608,7 +608,7 @@ function  recordImg(username, timestamp, fileurl, event){
 
 
 function PostSlackImg( userid, timestamp , url ){
-  if ( SLACK_URL　=== ""){
+  if ( SLACK_URL  === ""){
      Logger.log("slack url is blank");
   }
   else {
@@ -842,20 +842,20 @@ function doGet(e) {
       return ContentService.createTextOutput(JSON.stringify( snames )).setMimeType(ContentService.MimeType.JSON);
 
 
-  }　
+  }  
   else if (CMD.toUpperCase() == 'GETFEATURS'){
     //   地物の取得
 
-　　　let  tgsheet = e.parameter['sheet'] ? e.parameter['sheet']:false;
+      let  tgsheet = e.parameter['sheet'] ? e.parameter['sheet']:false;
 
      if ( tgsheet === false ){  //  シートの指定が無い場合
-　　　　　　tgsheet = "シート1";
+            tgsheet = "シート1";
      }
 
      
      let gjson = GetFeaturesGeoJSON( tgsheet );
 
-　　　space = 2;
+      space = 2;
      console.log( JSON.stringify( gjson, null,space ));
 
      return ContentService.createTextOutput(JSON.stringify( gjson, null, space  )).setMimeType(ContentService.MimeType.JSON);
@@ -865,7 +865,7 @@ function doGet(e) {
    else if (CMD.toUpperCase() == 'GETRASTERLAYERS'){
    let rlayers = GetRasterLayers();
 
-   　space = 2;
+     space = 2;
      console.log( JSON.stringify( rlayers, null,space ));
 
      return ContentService.createTextOutput(JSON.stringify( rlayers, null, space  )).setMimeType(ContentService.MimeType.JSON);
@@ -876,11 +876,11 @@ function doGet(e) {
     else if (CMD.toUpperCase() == 'GFTEST'){
     //   地物の取得
 
-　　/*
-　let  tgsheet = e.parameter['sheet'] ? e.parameter['sheet']:false;
+    /*
+  let  tgsheet = e.parameter['sheet'] ? e.parameter['sheet']:false;
 
      if ( tgsheet === false ){  //  シートの指定が無い場合
-　　　　　　tgsheet = "シート1";
+            tgsheet = "シート1";
      }
 
      
@@ -1026,7 +1026,7 @@ function doPost(e) {
             'replyToken': event.replyToken,
             'messages': [{
               'type': 'text',
-              'text': '画像共有　' + fileurl ,
+              'text': '画像共有  ' + fileurl ,
             }]
           });
         }
@@ -1061,7 +1061,7 @@ function doPost(e) {
             'replyToken': event.replyToken,
             'messages': [{
               'type': 'text',
-              'text': '動画共有　' + fileurl ,
+              'text': '動画共有  ' + fileurl ,
             }]
           });
         }
@@ -1085,16 +1085,16 @@ function doPost(e) {
 
           if(msg.substr(0,1)== '#') {
 
-　　　　　　　　let lmsg = msg.toLowerCase();
+                let lmsg = msg.toLowerCase();
 
              let mapurl = GetDeployURL() + "?cmd=MAP"
 
              if ( lmsg == "#map"){
-               　sendMsg(REPLY_URL, {
+                 sendMsg(REPLY_URL, {
                   'replyToken': event.replyToken,
                 'messages': [{
                  'type': 'text',
-                'text': '地図表示　' +  mapurl ,
+                'text': '地図表示  ' +  mapurl ,
                  }]
                 }); //  sendMsg
              }
@@ -1103,7 +1103,7 @@ function doPost(e) {
 
                let helptext = MakeHelpText();
 
-              　sendMsg(REPLY_URL, {
+                sendMsg(REPLY_URL, {
                   'replyToken': event.replyToken,
                 'messages': [{
                  'type': 'text',
@@ -1118,12 +1118,12 @@ function doPost(e) {
           else {
           recordText(username, event.timestamp, event.message.text, event);
 
-      　　 if (true) {
-          　sendMsg(REPLY_URL, {
+           if (true) {
+            sendMsg(REPLY_URL, {
             'replyToken': event.replyToken,
             'messages': [{
               'type': 'text',
-              'text': 'テキストメッセージ 　' +  event.message.text ,
+              'text': 'テキストメッセージ   ' +  event.message.text ,
             }]
           }); //  sendMsg
         }  // if true
@@ -1179,7 +1179,7 @@ function testHelp() {
 function MakeHelpText() {
 
     let helpstr = "利用方法\n\n";
-    helpstr =　helpstr +  "システムの目的\n";
+    helpstr =  helpstr +  "システムの目的\n";
 
     helpstr = helpstr +  "LINEで皆様が投稿した位置情報,テキスト,写真,動画,音声をクラウド上のシートに保存して利用するためのシステムです。位置情報がはいっていると投稿した情報を地図で確認できます\n\n";
 
