@@ -5,17 +5,16 @@
 <title>ハザードマップ</title>
 </title>
 <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
-<!-- update maplibbre-gl to v5.2.0 --> 
+
+<!--
+<script src="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.js"></script>
+<link href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css" rel="stylesheet" />
+<script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+-->
 
 <link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.css' />
 <script src='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.js'></script>
 <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
-
-<!---
-<script src="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.js"></script>
-<link href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css" rel="stylesheet" />
-<script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
---->
 
 <style>
 body { margin:0; padding:0; }
@@ -638,68 +637,25 @@ var map = new maplibregl.Map({
 map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
 map.addControl(new maplibregl.ScaleControl() );
 
-//   地図load時の処理
-
-
-map.on('load', async () => {
-   
-map.addSource('gsi_raster', {
-  
-  'type': 'raster',
-   tiles: [
-               'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
-           ],
-  'tileSize': 256,
-  'attribution':
-  '国土地理院',
-
-       });
-
-map.addLayer({
-   'id':'gsi_photo',
-      'type':'raster',
-      'source':'gsi_raster',
-      'minzoom':5,
-      'maxzoom':18,
-      'layout':{
-              'visibility':'none'
-              },
-       paint:{  'raster-opacity': 1.0}
-
-      });
-
-  bottom_layer_id  = 'gsi_photo';
-
-  
-  bottom_layer_id  = 'gsi_photo';
-
-  var  dpurl;
-  if ( GasMode == 1 ){
-  //       dpurl = <?= GetDeployURL(); ?>;
-    }
-  else {
-    dpurl = "https://script.google.com/macros/s/AKfycby86hvPUai-DasMeu8P7Ww9m8zI6xesD18-VMiNJDcz2m3HK6f3s7M6DDtx4PqFrz4-/exec";
-    
-  }
-
- var   GetFURL  = dpurl + "?cmd=GETFEATURS";
-
- var   GetRaster = dpurl + "?cmd=GETRASTERLAYERS"
-
- RasterLayers = [];
-
- 
-
- 
-
-  
-});
-
-  
 /*
-
 map.on('load', function () {
+*/
+map.on('load', async () => {
 
+
+  
+  var  dpurl;
+  if ( GasMode == 1 ){
+  //       dpurl = <?= GetDeployURL(); ?>;
+    }
+  else {
+    dpurl = "https://script.google.com/macros/s/AKfycby86hvPUai-DasMeu8P7Ww9m8zI6xesD18-VMiNJDcz2m3HK6f3s7M6DDtx4PqFrz4-/exec";
+    
+  }
+
+ var   GetFURL  = dpurl + "?cmd=GETFEATURS";
+
+ var   GetRaster = dpurl + "?cmd=GETRASTERLAYERS"
 
   
 map.addSource('gsi_raster', {
@@ -728,7 +684,7 @@ map.addLayer({
       });
 
   bottom_layer_id  = 'gsi_photo';
-
+/*
   var  dpurl;
   if ( GasMode == 1 ){
   //       dpurl = <?= GetDeployURL(); ?>;
@@ -741,6 +697,7 @@ map.addLayer({
  var   GetFURL  = dpurl + "?cmd=GETFEATURS";
 
  var   GetRaster = dpurl + "?cmd=GETRASTERLAYERS"
+ */
 
  RasterLayers = [];
 
@@ -860,9 +817,13 @@ map.addLayer({
          SetDragScript();   //  動的に作成した要素に対するイベントは作成後に追加　　ドラッグイベントを追加
 
 
-         var gfeature ;
+        
 
     //console.log(JSON.stringify(RasterLayers));
+
+/*
+  
+        var gfeature ;
         var request = new XMLHttpRequest();
         request.open("GET", GetFURL, true);
         request.send();
@@ -899,8 +860,6 @@ map.addLayer({
       
        //    Spread Sheet中の調査ポイントを追加 
 
-      
-
        map.addSource( 
                            'rpoints', {
                               'type': 'geojson',
@@ -912,6 +871,29 @@ map.addLayer({
 
 
 //    調査ポイントのアイコン
+ const iconImage = map.loadImage(
+  'https://raw.githubusercontent.com/yoichigmf/lbmap/511c8c3b03f785025f33c3e77ca313e72c1e737e/sprite/marker.png',
+   function (error, image) {
+       if (error) throw error;
+     
+   }
+   );
+
+   map.addImage('pin', iconImage);
+
+   map.addLayer({
+            'id': 'points',
+            'type': 'symbol',
+            'source': 'rpoints',
+            'layout': {
+            'icon-image': 'pin',
+            'icon-size': 0.7
+                   }
+      });
+    }
+      */
+
+/*
 map.loadImage(
   'https://raw.githubusercontent.com/yoichigmf/lbmap/511c8c3b03f785025f33c3e77ca313e72c1e737e/sprite/marker.png',
    function (error, image) {
@@ -932,14 +914,16 @@ map.loadImage(
 
 
     }
+);
+*/
 
-     );   //  end of loadImage
 
 
+       
+     
 
-    
- } //  end of onload
 
+         
 
 
 //    Spread Sheet中の調査ポイントを追加
@@ -951,7 +935,7 @@ map.addSource(
         }
 
 );
-
+*/
 
 
 
@@ -962,11 +946,82 @@ map.addSource(
   .catch(error => {
     // ネットワークエラーの場合はここに到達する
     console.error(error);
-  })
-   
+  }) // end of fetch
 
   //  右ボタンメニュー制御
   //document.oncontextmenu = function () {return false;}
+
+
+  
+        var gfeature ;
+        var request = new XMLHttpRequest();
+        request.open("GET", GetFURL, true);
+        request.send();
+      
+        request.responseTyoe = 'json';
+
+        request.onload = function() {   //onload
+             var  gj = request.response;
+      
+             gfeature = JSON.parse(gj);
+      
+             if ( gfeature["features"].length > 1 ) {  //  地物があるか
+                var bbox = turf.bbox(gfeature);
+         
+                map.fitBounds( bbox );
+      
+      
+             }
+             else {
+      
+              if (  gfeature["features"].length == 1 ) {
+                   gf = gfeature["features"][0]["geometry"]["coordinates"];
+      
+                   lng = gf[0];
+                   lat = gf[1];
+                   map.flyTo( {centor:[lng,lat], zoom:15, speed:0.3});
+      
+              }
+              else {
+              navigator.geolocation.getCurrentPosition(pos_success,pos_fail);
+              }
+             }
+      
+      
+       //    Spread Sheet中の調査ポイントを追加 
+
+       map.addSource( 
+                           'rpoints', {
+                              'type': 'geojson',
+                              'data': gfeature
+                                }
+      
+                            );
+
+
+
+//    調査ポイントのアイコン
+ const iconImage = map.loadImage(
+  'https://raw.githubusercontent.com/yoichigmf/lbmap/511c8c3b03f785025f33c3e77ca313e72c1e737e/sprite/marker.png',
+   function (error, image) {
+       if (error) throw error;
+     
+   }
+   );
+
+   map.addImage('pin', iconImage);
+
+   map.addLayer({
+            'id': 'points',
+            'type': 'symbol',
+            'source': 'rpoints',
+            'layout': {
+            'icon-image': 'pin',
+            'icon-size': 0.7
+                   }
+      });
+    }
+      
 
 
 
@@ -992,7 +1047,7 @@ new maplibregl.Popup()
 .setHTML(description)
 .addTo(map);
 
-  });
+  });  //  end of map click event
 
 
 
@@ -1000,8 +1055,7 @@ new maplibregl.Popup()
 
 
 
-});
- */
+}); //
 
 
  
