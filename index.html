@@ -700,7 +700,10 @@ map.addLayer({
  */
 
  RasterLayers = [];
-
+//    調査ポイントのアイコン
+const iconImage =  await map.loadImage(
+  'https://raw.githubusercontent.com/yoichigmf/lbmap/511c8c3b03f785025f33c3e77ca313e72c1e737e/sprite/marker.png'
+   );
 
  //  SpreadSheetに定義したラスタレイヤリストを設定する
  fetch(GetRaster, {
@@ -942,7 +945,7 @@ map.addSource(
 
 
 
-  })
+  }) //
   .catch(error => {
     // ネットワークエラーの場合はここに到達する
     console.error(error);
@@ -1000,16 +1003,9 @@ map.addSource(
 
 
 
-//    調査ポイントのアイコン
- const iconImage = map.loadImage(
-  'https://raw.githubusercontent.com/yoichigmf/lbmap/511c8c3b03f785025f33c3e77ca313e72c1e737e/sprite/marker.png',
-   function (error, image) {
-       if (error) throw error;
-     
-   }
-   );
 
-   map.addImage('pin', iconImage);
+
+   map.addImage('pin', iconImage.data);
 
    map.addLayer({
             'id': 'points',
@@ -1049,13 +1045,7 @@ new maplibregl.Popup()
 
   });  //  end of map click event
 
-
-
-
-
-
-
-}); //
+}); //  end of map load event
 
 
  
