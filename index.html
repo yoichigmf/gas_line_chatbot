@@ -637,9 +637,7 @@ var map = new maplibregl.Map({
 map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
 map.addControl(new maplibregl.ScaleControl() );
 
-/*
-map.on('load', function () {
-*/
+
 map.on('load', async () => {
 
 
@@ -684,20 +682,6 @@ map.addLayer({
       });
 
   bottom_layer_id  = 'gsi_photo';
-/*
-  var  dpurl;
-  if ( GasMode == 1 ){
-  //       dpurl = <?= GetDeployURL(); ?>;
-    }
-  else {
-    dpurl = "https://script.google.com/macros/s/AKfycby86hvPUai-DasMeu8P7Ww9m8zI6xesD18-VMiNJDcz2m3HK6f3s7M6DDtx4PqFrz4-/exec";
-    
-  }
-
- var   GetFURL  = dpurl + "?cmd=GETFEATURS";
-
- var   GetRaster = dpurl + "?cmd=GETRASTERLAYERS"
- */
 
  RasterLayers = [];
 //    調査ポイントのアイコン
@@ -820,132 +804,8 @@ const iconImage =  await map.loadImage(
          SetDragScript();   //  動的に作成した要素に対するイベントは作成後に追加　　ドラッグイベントを追加
 
 
-        
 
-    //console.log(JSON.stringify(RasterLayers));
-
-/*
-  
-        var gfeature ;
-        var request = new XMLHttpRequest();
-        request.open("GET", GetFURL, true);
-        request.send();
-      
-        request.responseTyoe = 'json';
-
-        request.onload = function() {   //onload
-             var  gj = request.response;
-      
-             gfeature = JSON.parse(gj);
-      
-             if ( gfeature["features"].length > 1 ) {  //  地物があるか
-                var bbox = turf.bbox(gfeature);
-         
-                map.fitBounds( bbox );
-      
-      
-             }
-             else {
-      
-              if (  gfeature["features"].length == 1 ) {
-                   gf = gfeature["features"][0]["geometry"]["coordinates"];
-      
-                   lng = gf[0];
-                   lat = gf[1];
-                   map.flyTo( {centor:[lng,lat], zoom:15, speed:0.3});
-      
-              }
-              else {
-              navigator.geolocation.getCurrentPosition(pos_success,pos_fail);
-              }
-             }
-      
-      
-       //    Spread Sheet中の調査ポイントを追加 
-
-       map.addSource( 
-                           'rpoints', {
-                              'type': 'geojson',
-                              'data': gfeature
-                                }
-      
-                            );
-
-
-
-//    調査ポイントのアイコン
- const iconImage = map.loadImage(
-  'https://raw.githubusercontent.com/yoichigmf/lbmap/511c8c3b03f785025f33c3e77ca313e72c1e737e/sprite/marker.png',
-   function (error, image) {
-       if (error) throw error;
-     
-   }
-   );
-
-   map.addImage('pin', iconImage);
-
-   map.addLayer({
-            'id': 'points',
-            'type': 'symbol',
-            'source': 'rpoints',
-            'layout': {
-            'icon-image': 'pin',
-            'icon-size': 0.7
-                   }
-      });
-    }
-      */
-
-/*
-map.loadImage(
-  'https://raw.githubusercontent.com/yoichigmf/lbmap/511c8c3b03f785025f33c3e77ca313e72c1e737e/sprite/marker.png',
-   function (error, image) {
-       if (error) throw error;
-       map.addImage('pin', image);
-
-
-
-       map.addLayer({
-            'id': 'points',
-            'type': 'symbol',
-            'source': 'rpoints',
-            'layout': {
-            'icon-image': 'pin',
-            'icon-size': 0.7
-                   }
-      });
-
-
-    }
-);
-*/
-
-
-
-       
-     
-
-
-         
-
-
-//    Spread Sheet中の調査ポイントを追加
-/*
-map.addSource( 
-        'rpoints', {
-        'type': 'geojson',
-         'data':GetFURL  
-        }
-
-);
-*/
-
-
-
-
-
-
-  }) //
+      }) //
   .catch(error => {
     // ネットワークエラーの場合はここに到達する
     console.error(error);
@@ -971,7 +831,7 @@ map.addSource(
              if ( gfeature["features"].length > 1 ) {  //  地物があるか
                 var bbox = turf.bbox(gfeature);
          
-                map.fitBounds( bbox );
+                map.fitBounds( bbox );    //  地物がある場合はその範囲に移動
       
       
              }
@@ -982,7 +842,7 @@ map.addSource(
       
                    lng = gf[0];
                    lat = gf[1];
-                   map.flyTo( {centor:[lng,lat], zoom:15, speed:0.3});
+                   map.flyTo( {centor:[lng,lat], zoom:15, speed:0.3});  //  地物がない場合は最初の地物に移動
       
               }
               else {
@@ -1005,9 +865,11 @@ map.addSource(
 
 
 
-   map.addImage('pin', iconImage.data);
+      map.addImage('pin', iconImage.data);
 
-   map.addLayer({
+      // Add a layer showing the places.
+
+      map.addLayer({
             'id': 'points',
             'type': 'symbol',
             'source': 'rpoints',
@@ -1026,9 +888,7 @@ map.addSource(
 
   map.on('click', 'points', function (e) {
         var coordinates = e.features[0].geometry.coordinates.slice();
-//var description = e.features[0].properties.description;
 
-   
 
        //  ポップアップ用のHTML作成
        var description = CreatePropertiesHTML( e.features);
@@ -1038,12 +898,12 @@ map.addSource(
 
  
  //   ポップアップ
-new maplibregl.Popup()
-.setLngLat(coordinates)
-.setHTML(description)
-.addTo(map);
+      new maplibregl.Popup()
+            .setLngLat(coordinates)
+            .setHTML(description)
+            .addTo(map);
 
-  });  //  end of map click event
+        });  //  end of map click event
 
 }); //  end of map load event
 
@@ -1245,10 +1105,6 @@ return false;
            if ( rec["kind"] == "video"){
                rhtml = rhtml + "<TR><TD>動画</TD><TD>";
       
-              // var tgurl = MakeDirectURL( rec["url"]);
-      
-      
-            //　rhtml = rhtml + "<img src=\""+ tgurl + "\"  width=\"200\" />";
       
                rhtml = rhtml + "<a href=\"" + rec["url"] + "\" target=\"movp\">動画</a>";
       
