@@ -5,9 +5,17 @@
 <title>ハザードマップ</title>
 </title>
 <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+<!-- update maplibbre-gl to v5.2.0 --> 
+
+<link rel='stylesheet' href='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.css' />
+<script src='https://unpkg.com/maplibre-gl@5.2.0/dist/maplibre-gl.js'></script>
+<script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+
+<!---
 <script src="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.js"></script>
 <link href="https://unpkg.com/maplibre-gl@2.1.9/dist/maplibre-gl.css" rel="stylesheet" />
 <script src='https://unpkg.com/@turf/turf@6/turf.min.js'></script>
+--->
 
 <style>
 body { margin:0; padding:0; }
@@ -407,7 +415,7 @@ a{
 <script>
 
   //   GAS で動いているかどうかを示すモード  1 GAS   0  not GAS
-  var  GasMode = 1;
+  var  GasMode = 0;
 
   function movelayer(){
 
@@ -630,6 +638,65 @@ var map = new maplibregl.Map({
 map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
 map.addControl(new maplibregl.ScaleControl() );
 
+//   地図load時の処理
+
+
+map.on('load', async () => {
+   
+map.addSource('gsi_raster', {
+  
+  'type': 'raster',
+   tiles: [
+               'https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg',
+           ],
+  'tileSize': 256,
+  'attribution':
+  '国土地理院',
+
+       });
+
+map.addLayer({
+   'id':'gsi_photo',
+      'type':'raster',
+      'source':'gsi_raster',
+      'minzoom':5,
+      'maxzoom':18,
+      'layout':{
+              'visibility':'none'
+              },
+       paint:{  'raster-opacity': 1.0}
+
+      });
+
+  bottom_layer_id  = 'gsi_photo';
+
+  
+  bottom_layer_id  = 'gsi_photo';
+
+  var  dpurl;
+  if ( GasMode == 1 ){
+  //       dpurl = <?= GetDeployURL(); ?>;
+    }
+  else {
+    dpurl = "https://script.google.com/macros/s/AKfycby86hvPUai-DasMeu8P7Ww9m8zI6xesD18-VMiNJDcz2m3HK6f3s7M6DDtx4PqFrz4-/exec";
+    
+  }
+
+ var   GetFURL  = dpurl + "?cmd=GETFEATURS";
+
+ var   GetRaster = dpurl + "?cmd=GETRASTERLAYERS"
+
+ RasterLayers = [];
+
+ 
+
+ 
+
+  
+});
+
+  
+/*
 
 map.on('load', function () {
 
@@ -664,10 +731,10 @@ map.addLayer({
 
   var  dpurl;
   if ( GasMode == 1 ){
-         dpurl = <?= GetDeployURL(); ?>;
+  //       dpurl = <?= GetDeployURL(); ?>;
     }
   else {
- 
+    dpurl = "https://script.google.com/macros/s/AKfycby86hvPUai-DasMeu8P7Ww9m8zI6xesD18-VMiNJDcz2m3HK6f3s7M6DDtx4PqFrz4-/exec";
     
   }
 
@@ -832,6 +899,8 @@ map.addLayer({
       
        //    Spread Sheet中の調査ポイントを追加 
 
+      
+
        map.addSource( 
                            'rpoints', {
                               'type': 'geojson',
@@ -863,15 +932,14 @@ map.loadImage(
 
 
     }
-);
+
+     );   //  end of loadImage
 
 
 
-       
-     
+    
+ } //  end of onload
 
-
-          }
 
 
 //    Spread Sheet中の調査ポイントを追加
@@ -883,7 +951,7 @@ map.addSource(
         }
 
 );
-*/
+
 
 
 
@@ -895,6 +963,7 @@ map.addSource(
     // ネットワークエラーの場合はここに到達する
     console.error(error);
   })
+   
 
   //  右ボタンメニュー制御
   //document.oncontextmenu = function () {return false;}
@@ -932,6 +1001,7 @@ new maplibregl.Popup()
 
 
 });
+ */
 
 
  
